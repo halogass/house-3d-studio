@@ -16,6 +16,12 @@ description: Take screenshots of a house-3d-studio project with Playwright from 
 Save images to `projects/<house>/shots/<date>-<name>.png` (git-ignore if the user prefers).
 Viewport 1280×800 (desktop) and 390×844 (phone) for the phone check.
 
+`node scripts/screenshots.mjs` (see its header / `docs/ENGINE.md`) covers: `street`, `entrance`,
+`garden`, `aerial`, `cut-<level>`, `room-<id>` (from the door), `plan-<level>`, `plan-site`, `mobile`;
+`--time 18.5 --prefix dusk-` for a dusk set, `--time 20 --prefix night-` for night;
+`--at x,y,level,yaw,pitch --name <view>` / `--cam x,y,h,tx,ty,th --name <view>` for one extra view.
+Prefer these to writing your own Playwright script.
+
 ## Fixed viewpoints
 - `plan` — 2D plan of each floor (studio plan view).
 - `dollhouse` — dollhouse/aerial of the whole house, each floor.

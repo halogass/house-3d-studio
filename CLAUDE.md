@@ -158,6 +158,12 @@ All commands are run from the repository root and are identical in PowerShell an
 | `npm run deploy` | deploy to Vercel (wraps `npx vercel`) |
 
 Every Node script also accepts `--project <name>` to work on a non-active project.
+**Run them exactly in this form, from the repository root:** `npm run <x>` or `node scripts/<x>.mjs …` —
+no `cd … &&` / `;` prefixes, no absolute script paths, no `node -e "…"` one-liners, no helper scripts of
+your own under `projects/`. The permission list in `.claude/settings.json` matches the command text, so
+any other form makes the user approve it (and is refused in a non-interactive run). Edit data files with
+the Edit / Write tools, not with shell or Node one-liners. Need another screenshot angle? Use
+`node scripts/screenshots.mjs --at x,y,level,yaw,pitch --name <view>` instead of writing a script.
 Passing flags: prefer `node scripts/<name>.mjs --flag value` over `npm run <name> -- --flag value`,
 because Windows PowerShell can swallow the `--` (see `docs/WINDOWS.md`).
 
