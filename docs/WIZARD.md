@@ -5,11 +5,24 @@
 The wizard is Claude Code following the instructions in this repository. You talk; it asks questions,
 edits the house data, tests everything and shows you pictures. You never need to edit code.
 
+**Before you start**
+- **Node.js** 22 or newer recommended (20.19 is the minimum); **Claude Code** with a Pro, Max, Team,
+  Enterprise or Console plan. On Windows, Git for Windows is recommended but not required.
+- Open a terminal **in the repository folder** and start `claude` there once in the normal
+  (interactive) way. When it asks whether you **trust this folder**, answer yes: only then does it use
+  this repository's permission list, so the wizard can run its checks without asking you each time.
+- Your plan and photos can stay where they are (e.g. `Downloads/denah rumah.jpg`, spaces are fine):
+  tell the wizard the path or drag the file into the chat; it copies them into the project's private
+  folder (`node scripts/import-files.mjs`).
+
 **Tips**
 - Answer the numbered questions by number ("1b, 2a, 3: 4 bedrooms"). "Up to you" is a fine answer — the
   wizard picks the recommended option and writes it down as an assumption you can change later.
 - You can stop at any time. Next time type `/lanjut` (or `/continue`).
 - You can always just type what you want: "make the kitchen bigger", "the sofa should face the window".
+- In a hurry? Put your answers in the same message as the command, e.g. `/denah my plan is in
+  Downloads/plan.jpg, the ceilings are standard, carport on the east`. The wizard then asks only what is
+  still missing, uses the recommended option for the rest, and lists those choices in `progress.md`.
 - Times below are for a normal laptop.
 
 ---

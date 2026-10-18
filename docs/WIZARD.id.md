@@ -5,11 +5,24 @@
 Wizard adalah Claude Code yang mengikuti petunjuk di repositori ini. Anda cukup mengobrol; wizard
 bertanya, mengubah data rumah, menguji semuanya, lalu menunjukkan gambar. Anda tidak perlu menyentuh kode.
 
+**Sebelum mulai**
+- **Node.js** versi 22 atau lebih baru disarankan (minimal 20.19); **Claude Code** dengan paket Pro, Max,
+  Team, Enterprise atau Console. Di Windows, Git for Windows disarankan tetapi tidak wajib.
+- Buka terminal **di folder repositori** lalu jalankan `claude` sekali secara biasa (interaktif). Saat
+  ditanya apakah Anda **memercayai folder ini (trust)**, jawab ya: baru setelah itu daftar izin
+  repositori ini dipakai, sehingga wizard bisa menjalankan pengecekan tanpa bertanya setiap kali.
+- Denah dan foto boleh tetap di tempatnya (mis. `Downloads/denah rumah.jpg`, spasi tidak masalah):
+  sebutkan lokasinya atau seret file ke chat; wizard menyalinnya ke folder pribadi proyek
+  (`node scripts/import-files.mjs`).
+
 **Tips**
 - Jawab pertanyaan bernomor dengan nomornya ("1b, 2a, 3: 4 kamar"). "Terserah" juga boleh — wizard
   memilih opsi yang disarankan dan mencatatnya sebagai asumsi yang bisa Anda ubah nanti.
 - Anda bisa berhenti kapan saja. Lain kali ketik `/lanjut`.
 - Anda selalu boleh mengetik keinginan langsung: "dapurnya dibesarkan", "sofanya menghadap jendela".
+- Ingin cepat? Tulis jawaban Anda sekalian bersama perintahnya, mis. `/denah denah saya di
+  Downloads/denah.jpg, plafon standar, carport di timur`. Wizard hanya menanyakan yang masih kurang,
+  memakai pilihan yang disarankan untuk sisanya, dan mencatatnya di `progress.md`.
 - Perkiraan waktu di bawah untuk laptop biasa.
 
 ---

@@ -14,7 +14,7 @@
 //          --out <dir>, --port <n>. Without a GPU the pictures still come out (slowly, software).
 import { createServer } from 'vite';
 import { mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { useProject, activeProject, ROOT } from './lib/project.mjs';
 import { gpuLaunchOptions, gpuInfo } from './lib/browser.mjs';
 
@@ -26,7 +26,7 @@ const { Z, PROJECT } = await import('../engine/data.js');
 const { LEVEL_ORDER, GROUND } = await import('../engine/config.js');
 const only = arg('only') ? arg('only').split(',') : null;
 const want = (v) => !only || only.some(o => v === o || v.startsWith(o + '-') || (o === 'rooms' && v.startsWith('room-')) || (o === 'cuts' && v.startsWith('cut-')) || (o === 'plan' && v.startsWith('plan-')));
-const out = arg('out') ? join(ROOT, arg('out')) : join(dir, 'shots');
+const out = arg('out') ? resolve(ROOT, arg('out')) : join(dir, 'shots'); // relative to the repo, or absolute
 mkdirSync(out, { recursive: true });
 const W = +arg('width', 1280), H = +arg('height', 800);
 const common = `quality=${arg('quality', 'high')}&time=${arg('time', 10)}&month=${arg('month', 7)}&ui=0&staged=0`;

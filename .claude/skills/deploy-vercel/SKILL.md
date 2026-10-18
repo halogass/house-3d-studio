@@ -28,8 +28,8 @@ vercel.com/new (Framework: Vite; build `npm run build`; output `dist`).
 ## 3. Link + first deploy (preview)
 Linking asks questions, so the **user** runs it in their own terminal: `npx vercel link` → scope = their
 personal account, "link to existing project?" no, project name e.g. `my-house-3d` (lowercase, dashes),
-directory `./`. This creates `.vercel/` (git-ignored). Then you run `npx vercel --yes` (preview deploy,
-non-interactive; or `npm run deploy` if that script does a preview deploy) and report the preview URL.
+directory `./`. This creates `.vercel/` (git-ignored). Then you run `npm run deploy` (validates, then a preview deploy;
+non-interactive; the user gets a permission prompt first) and report the preview URL.
 
 ## 4. PIN (optional, recommended)
 User, in the Vercel dashboard → Project → Settings → Environment Variables (Production + Preview):
@@ -50,8 +50,11 @@ changing `SITE_PIN` + redeploy logs everyone out.
 5. Voice over mobile data may need a TURN server (optional env, see `docs/ENGINE.md`).
 
 ## 6. Production deploy
-`npx vercel --prod` (identical in PowerShell and bash). If `package.json` has a `deploy` script that
-already deploys to production, `npm run deploy` is fine too (check what it does first).
+`node scripts/deploy.mjs --prod` (validates first; identical in PowerShell and bash; `npm run deploy`
+alone makes a preview). Claude Code shows the user a **permission prompt** before any deploy command
+(`npm run deploy`, `node scripts/deploy.mjs`, `npx vercel …`): say so before you run it, and run
+`node scripts/deploy.mjs --prod --dry-run` first if the user wants to see what will happen. Unknown
+flags are refused, so a typo cannot turn a production deploy into a preview or the reverse.
 
 ## 7. Verify (you)
 - Fetch the production URL (WebFetch, or

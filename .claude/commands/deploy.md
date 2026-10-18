@@ -7,7 +7,11 @@ argument-hint: ""
 
 Use the `deploy-vercel` skill, step by step, waiting for the user at each account/login step.
 Before anything: `npm run validate`, `npm run check`, `npm run test`, `npm run build` must pass, and
-`git status` must show no secrets or private photos staged. Ask one batch first:
+`git status` must show no secrets or private photos staged. `node scripts/deploy.mjs --dry-run` shows
+what would be deployed without uploading anything.
+Claude Code asks the user for permission before `npm run deploy` / `node scripts/deploy.mjs` runs
+(deploying publishes the house). Tell the user beforehand that a permission prompt will appear and
+that they should approve it only if they want the house online now. Ask one batch first:
 1. PIN protection? (recommended: yes, 6+ digits, the user types it into Vercel themselves — never into chat)
 2. Multiplayer online? (needs Supabase keys)
 3. Project name / URL wish.

@@ -38,7 +38,7 @@ const headed = flag('headed'), force = flag('force');
 if (flag('debug-overdraw')) base.debugOverdraw = true;
 const GPU = arg('gpu');
 if (!chromePath()) {
-  console.log('✗ No Chromium found. Install it once with: npx playwright install chromium\n  Chromium belum ada. Pasang sekali dengan: npx playwright install chromium');
+  console.log('✗ No Chromium found. Install it once with: npx playwright-core install chromium\n  Chromium belum ada. Pasang sekali dengan: npx playwright-core install chromium');
   process.exit(1);
 }
 

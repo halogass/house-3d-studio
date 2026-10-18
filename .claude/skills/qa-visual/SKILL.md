@@ -10,7 +10,7 @@ description: Take screenshots of a house-3d-studio project with Playwright from 
    `node scripts/screenshots.mjs`) — read `docs/ENGINE.md` for its options (viewpoint list, output dir).
 2. Playwright directly: start `npm run dev` in the background (or `npm run preview` after a build), then a
    small Node script using `playwright` / `playwright-core` (`chromium.launch()`), or the Playwright MCP
-   browser tools if available. First time only: `npx playwright install chromium`.
+   browser tools if available. First time only: `npx playwright-core install chromium`.
    Use the engine's debug hook / URL parameters (documented in `docs/ENGINE.md`) to teleport the camera,
    set the floor, time of day and dollhouse/plan mode — never rely on simulated key presses for position.
 Save images to `projects/<house>/shots/<date>-<name>.png` (git-ignore if the user prefers).

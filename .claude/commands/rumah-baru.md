@@ -9,7 +9,7 @@ Reply in the user's language (Indonesian if they used `/rumah-baru` or write Ind
 Follow `CLAUDE.md` golden rules.
 
 ## Step 0 — setup (stage 0)
-1. Check tools quietly: `node -v` (needs ≥ 20.6), and that `node_modules/` exists. If not, run `npm install`
+1. Check tools quietly: `node -v` (22+ recommended, 20.19 minimum), and that `node_modules/` exists. If not, run `npm install`
    (tell the user it takes 1–3 minutes). If Node is missing, stop and point them to `README.md` → Install.
 2. List `projects/`. If a non-sample project already exists, ask: continue that one (`/lanjut`) or start
    another (one copy of the repo is meant for one house — a second house is fine for experiments).

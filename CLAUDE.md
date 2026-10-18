@@ -64,7 +64,7 @@ entry and exit criteria. Never skip an exit criterion silently; if the user want
 
 | # | Stage | Command | Skill(s) | Entry | Exit |
 |---|---|---|---|---|---|
-| 0 | Setup | `/rumah-baru` · `/new-house` | — | Node ≥ 20.6 + `npm install` done | `projects/<house>/` created from `_template`, set active, `progress.md` started |
+| 0 | Setup | `/rumah-baru` · `/new-house` | — | Node 22+ (20.19 minimum) + `npm install` done | `projects/<house>/` created from `_template`, set active, `progress.md` started |
 | 1 | Brief | `/rumah-baru` (continues) | `brief-interview` | stage 0 done | `brief.md` filled; user confirmed the summary |
 | 2 | Plan & zoning | `/denah` · `/floorplan` | `floorplan-ingest` | brief confirmed | rooms/openings/levels in house data; `validate` + `check` green; user approved the 2D plan |
 | 3 | Style | `/gaya` · `/style` | `style-from-inspo` | plan approved | per-room style table in `style.md`; finishes in interior data; textures only for owned photos |
@@ -204,14 +204,16 @@ Never store secrets, PINs, keys or addresses in it.
 | Symptom | Likely cause → fix |
 |---|---|
 | `'npm' is not recognized` / `command not found: npm` | Node not installed or terminal opened before install → install Node LTS, open a **new** terminal |
-| `npm install` errors about engine / syntax | Node too old → `node -v` must be ≥ 20.6 (22 LTS recommended) |
+| `npm install` errors about engine / syntax | Node too old → `node -v`: 22 or newer recommended, 20.19 minimum (install the current LTS) |
 | `npm run x -- --flag` ignores the flag on Windows | PowerShell `--` issue → use `node scripts/x.mjs --flag` or `npm.cmd run x -- --flag` |
 | Paths with spaces / OneDrive folder problems on Windows | Move the repo to e.g. `C:\dev\my-house` (see `docs/WINDOWS.md`) |
 | Dev server URL does not open from phone | Same Wi-Fi? Windows firewall prompt → allow Node on *private* networks |
 | Black screen, "WebGL context lost" on tablet/phone | Mobile GPU memory → use the Light/low quality tier, reduce furniture reach, hide other floors (engine has a mobile path; see `docs/ENGINE.md`); avoid huge textures |
 | Very low FPS, "software rendering" warning | No GPU acceleration in the browser → enable hardware acceleration in browser settings / update graphics driver; use low quality |
 | `npm run bake` fails or is extremely slow | No suitable GPU → skip bake; real-time lighting is fine. Never run other GPU screenshots during a bake |
-| Screenshots blank / Playwright error | Browser not installed → `npx playwright install chromium` (once) |
+| Every `npm run …` asks for permission, or is refused in a non-interactive run ("workspace has not been trusted") | The folder's trust dialog was never accepted, so `.claude/settings.json` is ignored → ask the user to start `claude` once interactively in the repo folder and accept "trust"; meanwhile ask them to approve each prompt. Never edit their global config to get around it |
+| User asks which Claude Code plan / Git they need | Claude Code: Pro, Max, Team, Enterprise or Console. Git for Windows: recommended (Git Bash, version history), not required |
+| Screenshots blank / Playwright error | Browser not installed → `npx playwright-core install chromium` (once) |
 | Door test fails after interior edit | Furniture inside a door swing or route → move it (≥ 0.9 m clear path) |
 
 ---

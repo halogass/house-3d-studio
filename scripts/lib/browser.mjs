@@ -7,7 +7,7 @@
 //            through PRIME render offload (the X screen's card is BAKE_DISPLAY_GPU, default 0).
 // Without a usable GPU Chromium falls back to SwiftShader (software): gpuInfo() tells, so the
 // bake can skip instead of crawling for hours.
-// Chromium itself: Playwright's (`npx playwright install chromium`) or CHROME=/path/to/chrome.
+// Chromium itself: Playwright's (`npx playwright-core install chromium`) or CHROME=/path/to/chrome.
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
