@@ -1,0 +1,128 @@
+# Continuous integration: the same checks the wizard runs, on Windows, macOS and Linux.
+# Everything is Node-only, so the commands are identical on every OS; the extra Windows steps run
+# them through cmd.exe and Windows PowerShell 5.1 too, to catch shell-specific surprises.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} · Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        # 20 = oldest supported line, 22 = previous LTS, 24 = current LTS (what nodejs.org offers)
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Validate data
+        run: npm run validate
+
+      - name: Walkability check
+        run: npm run check
+
+      - name: Interior check
+        run: npm run check-interior
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Tracked files unchanged by the checks and the build
+        run: git diff --exit-code
+
+      - name: New project from the template
+        run: |
+          npm run new-project ci-house
+          npm run validate
+          npm run check
+          npm run check-interior
+          npm run build
+
+      # cmd.exe: npm is a .cmd file there, so every call needs CALL and an explicit error check
+      - name: Windows cmd
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call npm run use-project sample-house || exit /b 1
+          call npm run validate || exit /b 1
+          call npm run new-project ci-cmd || exit /b 1
+          call npm run validate || exit /b 1
+          call npm run check || exit /b 1
+          call npm run build || exit /b 1
+          node scripts\validate.mjs --project sample-house || exit /b 1
+
+      # Windows PowerShell 5.1 (the one preinstalled on every Windows 10/11 PC; pwsh above is 7.x)
+      - name: Windows PowerShell 5.1
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          function Run { param([string]$cmd) Write-Host "> $cmd"; Invoke-Expression $cmd; if ($LASTEXITCODE) { throw "failed: $cmd" } }
+          Run 'npm run use-project sample-house'
+          Run 'npm run validate'
+          Run 'npm run new-project ci-ps'
+          Run 'npm run validate'
+          Run 'npm run check'
+          Run 'node scripts\validate.mjs --project sample-house'
+
+      # Informational: does `npm run x -- --flag` reach the script in each Windows shell?
+      # (docs/WINDOWS.md documents a workaround for shells that swallow `--`.)
+      - name: Windows argument passing (informational)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          npm run use-project ci-ps
+          $out = npm run validate -- --project sample-house | Out-String
+          if ($out -notmatch 'sample-house') { Write-Host "::warning::Windows PowerShell 5.1 did not pass '-- --project' to the script"; exit 1 }
+          Write-Host "Windows PowerShell 5.1 passes '-- --flag' through"
+
+  smoke:
+    name: Browser smoke test (headless Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium (same Playwright version as package-lock)
+        run: npx playwright-core install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+
+      - name: Pages load without errors (software WebGL)
+        run: node .github/scripts/smoke.mjs
