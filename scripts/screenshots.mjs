@@ -24,6 +24,7 @@ const dir = useProject(name);
 process.env.PROJECT = name;
 const { Z, PROJECT } = await import('../engine/data.js');
 const { LEVEL_ORDER, GROUND } = await import('../engine/config.js');
+const DOOR_TYPES = new Set(['swing', 'double', 'sliding', 'folding', 'opening', 'garage']);
 const only = arg('only') ? arg('only').split(',') : null;
 const want = (v) => !only || only.some(o => v === o || v.startsWith(o + '-') || (o === 'rooms' && v.startsWith('room-')) || (o === 'cuts' && v.startsWith('cut-')) || (o === 'plan' && v.startsWith('plan-')));
 const out = arg('out') ? resolve(ROOT, arg('out')) : join(dir, 'shots'); // relative to the repo, or absolute
@@ -76,11 +77,26 @@ try {
   for (const lv of LEVEL_ORDER) for (const r of Z.floors[lv] || []) {
     if (pick ? !pick.includes(r.id) : !want('room-' + r.id)) continue;
     const [x0, y0, x1, y1] = r.r;
-    // stand near one end of the longer side, looking along it
-    const alongX = x1 - x0 >= y1 - y0;
-    const x = alongX ? x0 + 0.9 : (x0 + x1) / 2, y = alongX ? (y0 + y1) / 2 : y0 + 0.9;
-    const yaw = alongX ? 90 : 0;
-    await shot(`room-${r.id}.png`, `?${common}&at=${x},${y},${lv},${yaw},-8`);
+    // stand just inside the room's widest door (its clear zone is kept free of furniture by
+    // check-interior), looking at the far corner; rooms without a door: near one end, looking along
+    const door = (Z.openings[lv] || []).filter((o) => DOOR_TYPES.has(o.t) && (o.o === 'h'
+      ? (Math.abs(o.y - y0) < 1e-6 || Math.abs(o.y - y1) < 1e-6) && o.x >= x0 - 1e-6 && o.x + o.w <= x1 + 1e-6
+      : (Math.abs(o.x - x0) < 1e-6 || Math.abs(o.x - x1) < 1e-6) && o.y >= y0 - 1e-6 && o.y + o.w <= y1 + 1e-6)).sort((a, b) => b.w - a.w)[0];
+    let x, y, yaw;
+    if (door) {
+      const h = door.o === 'h', mid = (h ? door.x : door.y) + door.w / 2;
+      const inward = h ? (Math.abs(door.y - y0) < 1e-6 ? 1 : -1) : (Math.abs(door.x - x0) < 1e-6 ? 1 : -1);
+      const step = Math.min(x1 - x0, y1 - y0) < 3 ? 0.3 : 0.7;  // small rooms (baths): in the doorway
+      x = h ? mid : door.x + inward * step; y = h ? door.y + inward * step : mid;
+      const fx = h ? (mid - x0 < x1 - mid ? x1 : x0) : (inward > 0 ? x1 : x0);  // far corner
+      const fy = h ? (inward > 0 ? y1 : y0) : (mid - y0 < y1 - mid ? y1 : y0);
+      yaw = Math.round((Math.atan2(fx - x, fy - y) * 180 / Math.PI + 360) % 360);  // 0 = north, 90 = east
+    } else {
+      const alongX = x1 - x0 >= y1 - y0;
+      x = alongX ? x0 + 0.9 : (x0 + x1) / 2; y = alongX ? (y0 + y1) / 2 : y0 + 0.9;
+      yaw = alongX ? 90 : 0;
+    }
+    await shot(`room-${r.id}.png`, `?${common}&at=${x.toFixed(2)},${y.toFixed(2)},${lv},${yaw},-8`);
   }
   for (const lv of ['site', ...LEVEL_ORDER]) if (want('plan-' + lv)) await shot(`plan-${lv}.png`, `studio/plan.html?level=${lv}&furniture=1&grid=1`, { plan: true });
   if ((!only && !process.argv.includes('--no-mobile')) || process.argv.includes('--mobile') || want('mobile')) await shot('mobile.png', `?${common.replace('quality=high', 'quality=low')}`, { mobile: true });
