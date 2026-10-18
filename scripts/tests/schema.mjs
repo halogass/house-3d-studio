@@ -20,6 +20,7 @@ const cases = [
   ['unknown opening type', (z) => { (z.openings[lv] ||= []).push({ o: 'h', x: 1, y: 1, w: 0.9, t: 'portal' }); }, /unknown/],
   ['missing levels', (z) => { z.levels = []; }, /No levels/],
   ['stair to a lower level', (z) => { if (z.stairs?.length) [z.stairs[0].from, z.stairs[0].to] = [z.stairs[0].to, z.stairs[0].from]; else z.stairs = [{ r: [1, 1, 2, 5], from: lv, to: lv }]; }, /higher|must be existing/],
+  ['unknown door material', (z) => { z.openings[lv][0].mat = 'unobtanium'; }, /not a material name/],
   ['bad site kind', (z) => { z.site.items.push({ kind: 'helipad', r: [0, 0, 1, 1] }); }, /unknown/],
 ];
 for (const [name, mutate, expect] of cases) {

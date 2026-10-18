@@ -183,11 +183,11 @@ export function buildWorld(M, physics, opts = {}) {
     const dyn = DOOR_MODE.dynamic; // engine/doors.js draws the moving leaves (closed, animated)
     if (dyn && d.t !== 'sliding' && d.t !== 'folding') { /* leaves come from engine/doors.js */ }
     else if (d.t === 'swing') {
-      if (d.hinge === 'e') leaf(along + d.w, -d.w, side, 0.05, 'door');
-      else leaf(along, d.w, side, 0.05, 'door');
+      if (d.hinge === 'e') leaf(along + d.w, -d.w, side, 0.05, d.mat || 'door');
+      else leaf(along, d.w, side, 0.05, d.mat || 'door');
     } else if (d.t === 'double') {
-      leaf(along, d.w / 2, side, 0.05, 'door');
-      leaf(along + d.w, -d.w / 2, side, 0.05, 'door');
+      leaf(along, d.w / 2, side, 0.05, d.mat || 'door');
+      leaf(along + d.w, -d.w / 2, side, 0.05, d.mat || 'door');
     } else if (d.t === 'sliding' || d.t === 'folding') {
       // Glass panel parked over the first half of the opening (still a barrier there)
       const a = along, b = along + d.w * 0.5;

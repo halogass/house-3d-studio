@@ -290,6 +290,7 @@ export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = 
     for (const [i, o] of (z.openings[lv] || []).entries()) {
       const w = `zoning.openings.${lv}[${i}]`;
       if (!o || !['h', 'v'].includes(o.o)) { E(w, '"o" harus "h" (dinding mendatar, sejajar sumbu x) atau "v" (dinding tegak, sejajar sumbu y).', '"o" must be "h" (horizontal wall, along x) or "v" (vertical wall, along y).'); continue; }
+      if (o.mat !== undefined && isMaterial && !isMaterial(o.mat) && !custom[o.mat]) E(w, `"mat" "${o.mat}" bukan nama material (mis. "teak", "lacquer:#f2efe7").`, `"mat" "${o.mat}" is not a material name (e.g. "teak", "lacquer:#f2efe7").`);
       if (!OPENING_TYPES[o.t]) { E(w, `Jenis bukaan "${o.t}" tidak dikenal. Pilih: ${Object.keys(OPENING_TYPES).join(', ')}.`, `Opening type "${o.t}" is unknown. Pick one of: ${Object.keys(OPENING_TYPES).join(', ')}.`); continue; }
       if (!isNum(o.x) || !isNum(o.y) || !isNum(o.w) || o.w <= 0.3) { E(w, 'Bukaan butuh x, y (angka) dan lebar w > 0,3 m.', 'An opening needs numbers x, y and a width w > 0.3 m.'); continue; }
       const fixed = o.o === 'h' ? o.y : o.x, a0 = o.o === 'h' ? o.x : o.y, a1 = a0 + o.w;

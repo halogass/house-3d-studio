@@ -231,6 +231,7 @@ openings: {
 | `t` | type (below) |
 | `side` | `+1`: the leaf swings towards +y (`h`) / +x (`v`); `-1` the other way. Sliding/folding: the side the moving panel runs on |
 | `hinge` | `'s'` hinge at the start end (small x / y), `'e'` at the far end (swing doors) |
+| `mat` | swing / double doors: material of this door's leaves (e.g. a `walnut` front door while `style.door` paints the others) |
 
 | t | kind | heights |
 |---|---|---|

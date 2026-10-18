@@ -149,7 +149,7 @@ export class Doors {
         this._part(leaf, d, g, 'box', 'railing', part(L - 0.05, L, 0.05, H, 0, 0.05));
         for (let x = 0.15; x < L - 0.1; x += 0.12) this._part(leaf, d, g, 'box', 'railing', part(x, x + 0.025, 0.13, H - 0.08, 0, 0.025));
       } else if (kind === 'wood') {
-        this._part(leaf, d, o.group, 'panel', 'door', new THREE.Matrix4().makeScale(L, H, 1));
+        this._part(leaf, d, o.group, 'panel', o.mat || 'door', new THREE.Matrix4().makeScale(L, H, 1));
         // lever handles + roses on both faces
         const hz = Math.min(1.0, H * 0.46);
         for (const s of [1, -1]) {
