@@ -30,8 +30,17 @@ const interior = await load('interior.js');
 if (project && zoning && interior) {
   const { validate } = await import('../engine/schema.js');
   const { FURNITURE, furnitureInfo } = await import('../engine/interior/furniture/index.js');
-  const res = validate(project, zoning, interior, { furnitureTypes: new Set(Object.keys(FURNITURE)), furnitureInfo });
+  const { isMaterialName } = await import('../engine/materials.js');
+  const res = validate(project, zoning, interior, { furnitureTypes: new Set(Object.keys(FURNITURE)), furnitureInfo, isMaterial: (n) => isMaterialName(n) });
   errors.push(...res.errors); warnings.push(...res.warnings);
+  // the house's own textures must exist: projects/<house>/textures/<texture>/diff.jpg (+ maps)
+  for (const [m, def] of Object.entries(project.materials || {})) {
+    if (!def?.texture) continue;
+    for (const map of def.maps || ['diff']) {
+      const f = join(dir, 'textures', def.texture, map + '.jpg');
+      if (!existsSync(f)) errors.push({ where: `project.json materials.${m}`, id: `Tekstur tidak ditemukan: projects/${name}/textures/${def.texture}/${map}.jpg. Buat dengan: node scripts/texture-from-photo.mjs <foto> --name ${def.texture}`, en: `Texture not found: projects/${name}/textures/${def.texture}/${map}.jpg. Make it with: node scripts/texture-from-photo.mjs <photo> --name ${def.texture}` });
+    }
+  }
   if (project.name && project.name !== name && !existsSync(name)) warnings.push({ where: 'project.json name', id: `"name" (${project.name}) berbeda dengan nama folder (${name}).`, en: `"name" (${project.name}) differs from the folder name (${name}).` });
 }
 

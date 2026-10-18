@@ -19,6 +19,7 @@
 import * as THREE from 'three';
 import { MeshBVH, MeshBVHUniformStruct, FloatVertexAttributeTexture, BVHShaderGLSL } from 'three-mesh-bvh';
 import { makeMaterials } from '../materials.js';
+import { PROJECT } from '../data.js';
 import { Physics } from '../physics.js';
 import { assemble } from '../assemble.js';
 import { DOOR_MODE } from '../geom.js';
@@ -256,7 +257,7 @@ window.runBake = async function runBake(opts = {}) {
 
   // 1. the property, as the app builds it
   DOOR_MODE.dynamic = true;
-  const { M, getMaterial, ready } = makeMaterials(renderer, {});
+  const { M, getMaterial, ready } = makeMaterials(renderer, { custom: PROJECT.materials, door: PROJECT.style.door });
   const physics = new Physics();
   const built = assemble({ M, getMaterial, physics });
   await ready();

@@ -7,7 +7,7 @@
 // fit the clear height. Prints violations (with the room and item) and exits 1 if there are any.
 import { useProject } from './lib/project.mjs';
 useProject();
-const { Z, INTERIOR: I } = await import('../engine/data.js');
+const { Z, INTERIOR: I, PROJECT } = await import('../engine/data.js');
 const { LEVELS, STAIRS, LIFT, LIFT_STOPS } = await import('../engine/config.js');
 const { footprintParts } = await import('../engine/interior/footprints.js');
 const { FURNITURE, furnitureInfo } = await import('../engine/interior/furniture/index.js');
@@ -25,7 +25,7 @@ const DOORS = ['swing', 'double', 'opening', 'sliding', 'folding', 'garage'];
 const WINDOWS = ['window', 'glass', 'high'];
 const REPLACEABLE = ['counter', 'island', 'wc', 'sink', 'tub', 'bench'];
 const OBSTACLE_FIX = ['wc', 'sink', 'shower', 'tub', 'counter', 'island', 'bench', 'partition', 'solid', 'stair', 'lift'];
-const isMaterial = v => typeof v === 'string' && (materialInfo(v).known || MATERIAL_NAMES.includes(v));
+const isMaterial = v => typeof v === 'string' && (materialInfo(v).known || MATERIAL_NAMES.includes(v) || !!PROJECT.materials?.[v]);
 const MAT_PARAMS = ['mat', 'frame', 'fabric', 'top', 'cabinet', 'art', 'bedding', 'pillow'];
 const FIN_MAT = ['floor', 'curtains', 'windowFrame', 'panelColor'];
 const INFO = Object.fromEntries(Object.keys(FURNITURE).map(t => [t, true]));

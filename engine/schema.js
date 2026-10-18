@@ -103,6 +103,7 @@ export function normalize(projectRaw = {}, zoningRaw = {}, interiorRaw = {}, tr 
     cost: { region: 'jawa-barat-2026', quality: 'standard', ...(project.cost || {}) },
     start: project.start || null,
     bake: project.bake || null,
+    materials: { ...(project.materials || {}) },
   };
 
   const levels = (z.levels || []).map(l => ({
@@ -177,7 +178,7 @@ function siteZone(kind) {
 
 // ---------------------------------------------------------------- validate
 // Messages are written for non-programmers: what is wrong, where, and what to do.
-export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = null, furnitureInfo = null } = {}) {
+export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = null, furnitureInfo = null, isMaterial = null } = {}) {
   const errors = [], warnings = [];
   const E = (where, id, en) => errors.push({ where, id, en });
   const W = (where, id, en) => warnings.push({ where, id, en });
@@ -188,6 +189,23 @@ export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = 
   if (p.location && p.location.lat !== undefined && !(isNum(p.location.lat) && Math.abs(p.location.lat) <= 66)) E('project.json location.lat', 'Lintang harus angka antara −66 dan 66 (mis. −6.9 untuk Bandung).', 'Latitude must be a number between −66 and 66 (e.g. −6.9 for Bandung).');
   for (const k of Object.keys(p.features || {})) if (!(k in FEATURES)) W(`project.json features.${k}`, `Fitur "${k}" tidak dikenal (diabaikan). Yang tersedia: ${Object.keys(FEATURES).join(', ')}.`, `Unknown feature "${k}" (ignored). Available: ${Object.keys(FEATURES).join(', ')}.`);
   if (p.language && !['id', 'en'].includes(p.language)) W('project.json language', 'Bahasa harus "id" atau "en".', 'Language must be "id" or "en".');
+  // the house's own materials (e.g. a floor texture from the owner's photo)
+  const custom = p.materials && typeof p.materials === 'object' ? p.materials : {};
+  if (p.materials !== undefined && (typeof p.materials !== 'object' || Array.isArray(p.materials))) E('project.json materials', '"materials" harus objek { nama: { texture, size, color } }.', '"materials" must be an object { name: { texture, size, color } }.');
+  for (const [name, m] of Object.entries(custom)) {
+    const w = `project.json materials.${name}`;
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(name)) E(w, `Nama material "${name}" hanya boleh huruf dan angka, diawali huruf (mis. "terasoKamarMandi").`, `Material name "${name}" may only use letters and digits, starting with a letter (e.g. "bathTerrazzo").`);
+    else if (isMaterial && isMaterial(name)) E(w, `"${name}" sudah dipakai oleh material bawaan. Pilih nama lain (mis. "${name}Ku").`, `"${name}" is already a built-in material. Choose another name (e.g. "my${name[0].toUpperCase() + name.slice(1)}").`);
+    if (!m || typeof m !== 'object') { E(w, 'Harus objek, mis. { "texture": "teraso", "size": 0.6 }.', 'Must be an object, e.g. { "texture": "terrazzo", "size": 0.6 }.'); continue; }
+    if (m.texture !== undefined && !/^[a-z0-9][a-z0-9-]*$/.test(m.texture)) E(w, `"texture" adalah nama folder di projects/<rumah>/textures/ (huruf kecil, angka, minus).`, `"texture" is a folder name in projects/<house>/textures/ (lowercase, digits, dashes).`);
+    if (m.texture !== undefined && !(isNum(m.size) && m.size >= 0.05 && m.size <= 10)) E(w, '"size" = berapa meter yang ditutup satu gambar tekstur (0,05–10), mis. 0.6 untuk ubin 60 cm.', '"size" = how many metres one texture image covers (0.05–10), e.g. 0.6 for a 60 cm tile.');
+    if (m.color !== undefined && !/^#[0-9a-fA-F]{6}$/.test(m.color)) E(w, '"color" harus #rrggbb.', '"color" must be #rrggbb.');
+    if (m.rough !== undefined && !(isNum(m.rough) && m.rough >= 0 && m.rough <= 1)) E(w, '"rough" (kekasaran) harus 0–1.', '"rough" (roughness) must be 0–1.');
+    if (m.texture === undefined && m.color === undefined) W(w, 'Tanpa "texture" atau "color" material ini putih polos.', 'Without "texture" or "color" this material is plain white.');
+  }
+  const matOk = (v) => !isMaterial || isMaterial(v) || !!custom[v];
+  if (p.style?.door !== undefined && !matOk(p.style.door)) E('project.json style.door', `"${p.style.door}" bukan nama material (lihat docs/SCHEMA.md "Material names", mis. "walnut", "teak", "lacquer:#f2efe7").`, `"${p.style.door}" is not a material name (see docs/SCHEMA.md "Material names", e.g. "walnut", "teak", "lacquer:#f2efe7").`);
+  if (p.style?.roof !== undefined && !matOk(p.style.roof)) E('project.json style.roof', `"${p.style.roof}" bukan material atap. Pilih: terracotta, roofTileDark, roofMetal, roofMetalLight.`, `"${p.style.roof}" is not a roof material. Pick: terracotta, roofTileDark, roofMetal, roofMetalLight.`);
 
   // -------- zoning.js
   const z = zoningRaw || {};

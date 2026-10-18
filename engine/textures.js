@@ -484,20 +484,26 @@ export function makeTextures(renderer) {
 // [u, v] repeats per UV unit (UVs are metres, so 1 / metres-per-tile).
 const loader = new THREE.TextureLoader();
 export const TEXTURE_BASE = (import.meta.env?.BASE_URL ?? '/') + 'textures/';
+// the house's own textures (projects/<house>/textures/, vite.config.js serves / copies them)
+export const PROJECT_TEXTURE_BASE = (import.meta.env?.BASE_URL ?? '/') + 'project-textures/';
 
 // lite (phones/tablets): colour map only, at most 512 px (diff-512.webp) — about a tenth of the GPU
 // memory of the full set and a third of the download.
 const LITE_MAX = 512;
 // WebP copies where they are smaller at the same look (scripts/textures.mjs, engine/texture-files.js);
 // the JPG is the fallback when a WebP fails to load.
-export function loadPBRSet(name, repeat, anisotropy, lite = false) {
-  const has = TEXTURE_FILES[name] || {};
+// opts (the house's own textures, project.json "materials"): { base, dir, maps } — JPGs only,
+// maps = which of diff / nor / rough exist (default diff only).
+export function loadPBRSet(name, repeat, anisotropy, lite = false, opts = null) {
+  const has = opts ? {} : TEXTURE_FILES[name] || {};
+  const base = opts ? opts.base : TEXTURE_BASE, dir = opts ? opts.dir : name;
+  const maps = opts ? (opts.maps || ['diff']) : ['diff', 'nor', 'rough'];
   const fileOf = (file) => lite && file === 'diff' && has.lite ? 'diff-512.webp' : file + (has[file] === 'webp' ? '.webp' : '.jpg');
   const fetchTex = (file) => new Promise((resolve, reject) => {
-    const url = TEXTURE_BASE + name + '/' + fileOf(file);
+    const url = base + dir + '/' + fileOf(file);
     loader.load(url, resolve, undefined, (e) => {
       if (url.endsWith('.jpg')) return reject(e);
-      loader.load(TEXTURE_BASE + name + '/' + file + '.jpg', resolve, undefined, reject);
+      loader.load(base + dir + '/' + file + '.jpg', resolve, undefined, reject);
     });
   });
   const load = (file, srgb) => fetchTex(file).then((t) => {
@@ -515,6 +521,7 @@ export function loadPBRSet(name, repeat, anisotropy, lite = false) {
     return t;
   });
   if (lite) return load('diff', true).then((map) => ({ map, normalMap: null, roughnessMap: null }));
-  return Promise.all([load('diff', true), load('nor', false), load('rough', false)])
+  const opt = (file) => maps.includes(file) ? load(file, false) : Promise.resolve(null);
+  return Promise.all([load('diff', true), opt('nor'), opt('rough')])
     .then(([map, normalMap, roughnessMap]) => ({ map, normalMap, roughnessMap }));
 }

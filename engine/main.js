@@ -113,7 +113,7 @@ scene.add(sun, sun.target);
 // ---------------------------------------------------------------- world
 // Phones/tablets and software rendering get light textures (colour only, ≤ 512 px)
 // Staged: photo textures are fetched only for what is built, nearest first, a few at a time
-const { M, getMaterial, want: wantTextures } = makeMaterials(renderer, { lite: isTouch || gpu.software, deferTextures: staged });
+const { M, getMaterial, want: wantTextures } = makeMaterials(renderer, { lite: isTouch || gpu.software, deferTextures: staged, custom: PROJECT.materials, door: PROJECT.style.door });
 DOOR_MODE.dynamic = FEATURES.doors !== false; // door leaves and gates are drawn and animated by engine/doors.js
 const physics = new Physics();
 const { groups, labels, lights: lightDefs, interior, energy, stage, vehicles } = (staged ? assembleStaged : assemble)({ M, getMaterial, physics });

@@ -8,6 +8,10 @@
 //   factories `paint:#rrggbb` (interior paint) / `lacquer:#rrggbb` (joinery) / `stucco:#rrggbb` (exterior render). Unknown names → neutral grey + one warning.
 // - setNightFactor(n 0..1): emissive / light materials glow at night (n = 1), subtle by day.
 // - ready: Promise that resolves when all photo PBR textures requested so far have loaded.
+// - custom: the house's own materials (project.json "materials", see docs/SCHEMA.md), e.g. a floor
+//   texture made from the owner's photo: { name: { texture, size, color, rough, metal, maps } }.
+//   Their photos live in projects/<house>/textures/<texture>/ and are served at /project-textures/.
+// - door: material name for every door leaf (project.json style.door), default 'door' (walnut).
 // - deferTextures (phones / tablets): photo sets are not fetched when a material is made, only
 //   once want(materials) names a material that uses them, in that order, `concurrency` at a time.
 //   want() with no argument queues every set requested so far.
@@ -15,7 +19,7 @@
 // Every material renders immediately with a colour (and the old canvas texture where one
 // exists); the CC0 photo maps (public/textures/<set>/) are swapped in when they arrive.
 import * as THREE from 'three';
-import { makeTextures, loadPBRSet } from './textures.js';
+import { makeTextures, loadPBRSet, PROJECT_TEXTURE_BASE } from './textures.js';
 import { installBakePatch } from './render/bake.js';
 
 // Photo PBR sets: metres covered by one tile (UVs are metres), or `rep` = fixed repeats per UV
@@ -219,8 +223,21 @@ export function setNightFactor(n) {
 }
 export function getNightFactor() { return nightFactor; }
 
-export function makeMaterials(renderer, { pbr = true, lite = false, deferTextures = false, concurrency = 3 } = {}) {
+export function makeMaterials(renderer, { pbr = true, lite = false, deferTextures = false, concurrency = 3, custom = null, door = null } = {}) {
   const T = makeTextures(renderer);
+  // the house's own materials → registry definitions + photo sets of their own
+  const sets = { ...SETS };
+  const customDefs = {};
+  for (const [name, c] of Object.entries(custom || {})) {
+    if (!c || typeof c !== 'object' || DEFS[name] || LEGACY[name]) continue;
+    const def = { c: c.color ? new THREE.Color(c.color).getHex() : 0xffffff, r: c.rough ?? 0.8, m: c.metal ?? 0 };
+    if (c.texture) {
+      const key = 'project:' + c.texture;
+      sets[key] = { size: c.size || 1, project: c.texture, maps: c.maps || ['diff'] };
+      def.set = key;
+    }
+    customDefs[name] = def;
+  }
   const aniso = Math.min(lite ? 4 : 16, renderer.capabilities.getMaxAnisotropy());
   T.pbr = {};
   const pending = [];
@@ -253,9 +270,10 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
   function photoSet(name) {
     if (!pbr) return null;
     if (!setPromises[name]) {
-      const s = SETS[name];
+      const s = sets[name];
       const rep = s.rep ? [s.rep, s.rep] : [1 / (s.size * (s.aspect || 1)), 1 / s.size];
-      const load = () => loadPBRSet(name, rep, aniso, lite).then((t) => (T.pbr[name] = t)).catch((e) => {
+      const opts = s.project ? { base: PROJECT_TEXTURE_BASE, dir: s.project, maps: s.maps } : undefined;
+      const load = () => loadPBRSet(name, rep, aniso, lite, opts).then((t) => (T.pbr[name] = t)).catch((e) => {
         console.warn(`[materials] texture set "${name}" failed to load; keeping fallback`, e?.message || e);
         return null;
       });
@@ -310,7 +328,7 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
     const setName = def.set;
     if (setName && pbr) setOf.set(mat, setName);
     if (setName) {
-      const detail = SETS[setName].detail;
+      const detail = sets[setName].detail;
       const baseColor = mat.color.clone();
       if (detail && !def.canvas) mat.userData.detailColor = baseColor;
       // 1 px stand-in maps look exactly like no maps, and when the photos arrive only the textures
@@ -367,8 +385,8 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
       const key = f[1] + ':' + hex;
       m = cache.get(key) || (f[1] === 'paint' ? paint(hex) : f[1] === 'stucco' ? stucco(hex) : lacquer(hex));
       cache.set(key, m);
-    } else if (DEFS[name]) {
-      m = build(DEFS[name], name);
+    } else if (DEFS[name] || customDefs[name]) {
+      m = build(DEFS[name] || customDefs[name], name);
     } else {
       if (!warned.has(name)) { warned.add(name); console.warn(`[materials] unknown material "${name}" → neutral grey`); }
       grey ??= Object.assign(new THREE.MeshStandardMaterial({ color: 0x9a9a9a, roughness: 0.8 }), { name: 'unknown' });
@@ -379,7 +397,13 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
   }
 
   // M: legacy keys as own properties; registry/factory names resolve lazily.
-  const isKnown = (k) => typeof k === 'string' && (k in DEFS || /^(paint|lacquer|stucco):#?[0-9a-fA-F]{6}$/.test(k));
+  // project.json style.door: every door leaf in that material (world.js / doors.js ask for 'door')
+  if (door && door !== 'door') {
+    const d = getMaterial(door);
+    if (d.name !== 'unknown') base.door = d;
+  }
+
+  const isKnown = (k) => typeof k === 'string' && (k in DEFS || k in customDefs || /^(paint|lacquer|stucco):#?[0-9a-fA-F]{6}$/.test(k));
   const M = new Proxy(base, {
     get(target, key, recv) {
       if (key in target) return Reflect.get(target, key, recv);
@@ -389,10 +413,17 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
   });
 
   const ready = () => Promise.all(pending);
-  return { M, T, getMaterial, setNightFactor, ready, want, names: [...Object.keys(LEGACY), ...Object.keys(DEFS)] };
+  return { M, T, getMaterial, setNightFactor, ready, want, names: [...Object.keys(LEGACY), ...Object.keys(DEFS), ...Object.keys(customDefs)] };
 }
 
 export const MATERIAL_NAMES = [...Object.keys(DEFS)];
+// Every name a material may be given in the data (registry, legacy keys incl. floors / roofs /
+// outside surfaces), without the colour factories; custom = project.json "materials".
+export const ALL_MATERIAL_NAMES = [...Object.keys(DEFS), ...Object.keys(LEGACY)];
+export function isMaterialName(name, custom = null) {
+  if (typeof name !== 'string') return false;
+  return name in DEFS || name in LEGACY || !!(custom && custom[name]) || /^(paint|lacquer|stucco):#?[0-9a-fA-F]{6}$/.test(name);
+}
 // The flags getMaterial(name) gives a material, without making it (Node tests, e.g. the bake-area
 // selection in scripts/test-bake.mjs must pick exactly the triangles the app picks):
 // { known, transparent, alphaTest, noShadow } (unknown names → the app's unpatched grey: known false)

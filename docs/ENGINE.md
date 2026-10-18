@@ -45,6 +45,10 @@ scripts/              Node tools (below); scripts/lib/ shared helpers; scripts/t
 middleware.js         optional PIN gate on Vercel (inert without SITE_PIN)
 ```
 
+The house's own textures (`projects/<name>/textures/`, project.json `materials`) are served at
+`/project-textures/` (dev) and copied to `dist/project-textures/` (build) by `vite.config.js`;
+`makeMaterials(renderer, { custom, door })` registers them (and the door-leaf material).
+
 How the active project reaches the engine: `vite.config.js` aliases `@project` to
 `projects/<active>/`; Node scripts call `useProject()` (scripts/lib/project.mjs), which registers a
 module hook doing the same. One build = one house.
@@ -66,6 +70,8 @@ module hook doing the same. One build = one house.
 | `screenshots` | `screenshots.mjs [--only …] [--rooms a,b] [--time 16] [--mobile]` | PNGs from fixed viewpoints → `projects/<name>/shots/` |
 | `new-project` | `new-project.mjs <name> [--title …] [--lang id]` | copy `_template`, make active |
 | `use-project` | `use-project.mjs [name]` | switch / list |
+| | `import-files.mjs <file\|folder> … --to plans\|inspo` | copy the owner's plans / photos into `projects/<name>/private/` (paths with spaces OK) |
+| | `texture-from-photo.mjs <photo> --name <n> [--crop x,y,w,h] [--seamless] [--size m]` | the house's own texture `projects/<name>/textures/<n>/diff.jpg` (SCHEMA.md) |
 | `deploy` | `deploy.mjs [--prod]` | validate, then `npx vercel deploy` (preview; production with `--prod`) |
 | | `catalogue.mjs` | regenerate the furniture / material catalogue in SCHEMA.md |
 
