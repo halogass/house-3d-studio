@@ -1,0 +1,8 @@
+{
+  "name": "mini-lift",
+  "title": "Test house (lift, straight stair, gable + shed roofs)",
+  "language": "en",
+  "location": { "lat": 14.6, "lon": 121.0, "region": "jawa-barat-2026" },
+  "features": { "lift": true, "pv": true },
+  "style": { "facade": "mediterranean", "roof": "terracotta" }
+}
