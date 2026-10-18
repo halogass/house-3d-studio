@@ -113,6 +113,9 @@ A tile, floor, wood or stone **the owner photographed** (or may use) can become 
    (`size` = metres one texture image covers: 0.6 for one 60 cm tile; measure or ask).
 3. Use the name: `interior.js` → `finish: { floor: 'teraso' }`, then `npm run validate`.
 
+For the cost estimate a floor in an own material is priced as "other floors" unless it says what it is
+like: `"costAs": "tileBath"` (ceramic tiles), `"travertine"` (stone-look), `"oak"` (wood).
+
 Names: letters and digits, starting with a letter, not a built-in name. Only a colour map
 (`diff.jpg`) is needed; `nor.jpg` / `rough.jpg` may be added with `"maps": ["diff", "nor", "rough"]`.
 `projects/<house>/textures/` is served at `/project-textures/` and **is part of the deploy** (unlike

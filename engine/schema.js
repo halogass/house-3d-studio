@@ -201,6 +201,7 @@ export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = 
     if (m.texture !== undefined && !(isNum(m.size) && m.size >= 0.05 && m.size <= 10)) E(w, '"size" = berapa meter yang ditutup satu gambar tekstur (0,05–10), mis. 0.6 untuk ubin 60 cm.', '"size" = how many metres one texture image covers (0.05–10), e.g. 0.6 for a 60 cm tile.');
     if (m.color !== undefined && !/^#[0-9a-fA-F]{6}$/.test(m.color)) E(w, '"color" harus #rrggbb.', '"color" must be #rrggbb.');
     if (m.rough !== undefined && !(isNum(m.rough) && m.rough >= 0 && m.rough <= 1)) E(w, '"rough" (kekasaran) harus 0–1.', '"rough" (roughness) must be 0–1.');
+    if (m.costAs !== undefined && isMaterial && !isMaterial(m.costAs)) E(w, `"costAs" harus nama material bawaan yang harganya dipakai (mis. "tileBath", "travertine", "oak").`, `"costAs" must be a built-in material whose price is used (e.g. "tileBath", "travertine", "oak").`);
     if (m.texture === undefined && m.color === undefined) W(w, 'Tanpa "texture" atau "color" material ini putih polos.', 'Without "texture" or "color" this material is plain white.');
   }
   // cost adjustments (engine/cost/rates/index.js withProject)

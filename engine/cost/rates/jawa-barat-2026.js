@@ -13,6 +13,12 @@
 const S = (Q, k) => Q.site[k] || 0;
 const O = (Q, t, k = 'n') => (Q.openings[t] || {})[k] || 0;
 const F = (Q, ...mats) => mats.reduce((s, m) => s + (Q.finishes.floor[m] || 0), 0);
+const TILE = ['tileBath', 'tileGrey'];
+const STONE = ['travertine', 'travertineHoned', 'marbleWhite', 'marbleGreen', 'graniteBlack', 'limestone', 'granite'];
+const WOOD = ['wood', 'woodDark', 'woodHerringbone', 'woodPlankDark', 'oak', 'oakLight', 'walnut', 'teak', 'cherry', 'mahogany'];
+// every other floor material (concrete, epoxy, carpet, rubber, the house's own materials …) is priced
+// as 'other' so no floor area is ever left out of the estimate
+const FOTHER = (Q) => Object.entries(Q.finishes.floor).filter(([m]) => !TILE.includes(m) && !STONE.includes(m) && !WOOD.includes(m)).reduce((s, [, a]) => s + a, 0);
 const R = (Q, ...mats) => mats.reduce((s, m) => s + (Q.roofs.byMaterial[m] || 0), 0);
 const pitched = (Q) => Q.roofs.sloped - (Q.roofs.byType.flat?.sloped || 0);
 
@@ -81,10 +87,10 @@ export default {
       { id: 'high', n: { id: 'Jendela atas / bovenlicht', en: 'High / clerestory windows' }, u: 'm²', q: Q => O(Q, 'high', 'area'), r: 1400000, qs: 0.8, lv: 'gfa' },
     ] },
     { id: 'finishes', name: { id: 'Finishing', en: 'Finishes' }, items: [
-      { id: 'fCeramic', n: { id: 'Lantai keramik / granit tile 60×60', en: 'Ceramic / porcelain floor tiles 60×60' }, u: 'm²', q: Q => F(Q, 'tileBath', 'tileGrey'), r: 240000, qs: 0.8, lv: 'gfa' },
-      { id: 'fStone', n: { id: 'Lantai granit tile motif batu / marmer lokal', en: 'Stone-look porcelain / local marble floor' }, u: 'm²', q: Q => F(Q, 'travertine', 'travertineHoned', 'marbleWhite', 'limestone', 'granite'), r: 420000, qs: 0.9, lv: 'gfa' },
-      { id: 'fWood', n: { id: 'Lantai kayu engineered / SPC motif kayu', en: 'Engineered wood / wood-look SPC floor' }, u: 'm²', q: Q => F(Q, 'wood', 'woodDark', 'woodHerringbone', 'woodPlankDark', 'oak', 'walnut', 'teak'), r: 380000, qs: 1, lv: 'gfa' },
-      { id: 'fOther', n: { id: 'Lantai lain (semen ekspos, epoxy, karpet, karet)', en: 'Other floors (polished concrete, epoxy, carpet, rubber)' }, u: 'm²', q: Q => F(Q, 'concrete', 'concretePolished', 'epoxy', 'carpet', 'rubber'), r: 260000, qs: 0.6, lv: 'gfa' },
+      { id: 'fCeramic', n: { id: 'Lantai keramik / granit tile 60×60', en: 'Ceramic / porcelain floor tiles 60×60' }, u: 'm²', q: Q => F(Q, ...TILE), r: 240000, qs: 0.8, lv: 'gfa' },
+      { id: 'fStone', n: { id: 'Lantai granit tile motif batu / marmer lokal', en: 'Stone-look porcelain / local marble floor' }, u: 'm²', q: Q => F(Q, ...STONE), r: 420000, qs: 0.9, lv: 'gfa' },
+      { id: 'fWood', n: { id: 'Lantai kayu engineered / SPC motif kayu', en: 'Engineered wood / wood-look SPC floor' }, u: 'm²', q: Q => F(Q, ...WOOD), r: 380000, qs: 1, lv: 'gfa' },
+      { id: 'fOther', n: { id: 'Lantai lain (semen ekspos, epoxy, karpet, karet, material sendiri)', en: 'Other floors (polished concrete, epoxy, carpet, rubber, own materials)' }, u: 'm²', q: FOTHER, r: 260000, qs: 0.6, lv: 'gfa' },
       { id: 'wTile', n: { id: 'Dinding keramik kamar mandi', en: 'Bathroom wall tiles' }, u: 'm²', q: Q => Q.finishes.wallTile, r: 260000, qs: 0.8, lv: 'gfa' },
       { id: 'wPaint', n: { id: 'Cat dinding interior (plamir + 2 lapis)', en: 'Interior wall paint (filler + 2 coats)' }, u: 'm²', q: Q => Q.finishes.wallPaint, r: 48000, qs: 0.5, lv: 'gfa' },
       { id: 'ceil', n: { id: 'Plafon gypsum rangka hollow + cat + list', en: 'Gypsum ceiling on steel frame + paint + cornice' }, u: 'm²', q: Q => Q.finishes.ceiling, r: 205000, qs: 0.6, lv: 'gfa' },

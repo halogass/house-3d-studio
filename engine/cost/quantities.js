@@ -65,7 +65,9 @@ export function computeQuantities({ Z, PROJECT, INTERIOR, energy = null, trees =
       lv.ceilingArea += a;
       const use = USES[r.use] || USES.other;
       const fin = finishOf(r.id);
-      const floor = fin.floor || use.floor || 'travertine';
+      // the house's own materials (project.json "materials") are priced like `costAs` if given
+      let floor = fin.floor || use.floor || 'travertine';
+      if (PROJECT?.materials?.[floor]?.costAs) floor = PROJECT.materials[floor].costAs;
       Q.finishes.floor[floor] = (Q.finishes.floor[floor] || 0) + a;
       // room wall faces (perimeter × clear height): tiled in wet rooms (or finish.walls 'tile')
       const faces = 2 * ((r.r[2] - r.r[0]) + (r.r[3] - r.r[1])) * clear;
