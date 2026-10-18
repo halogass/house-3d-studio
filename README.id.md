@@ -2,7 +2,7 @@
 
 **Rancang rumah Anda sambil mengobrol, lalu jelajahi dalam 3D di browser.**
 
-[![CI](https://github.com/OWNER/house-3d-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/house-3d-studio/actions/workflows/ci.yml)
+[![CI](https://github.com/halogass/house-3d-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/halogass/house-3d-studio/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Windows · macOS · Linux](https://img.shields.io/badge/runs%20on-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-555)
 

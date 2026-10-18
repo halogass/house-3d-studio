@@ -26,5 +26,5 @@ First public version of the template.
 - Docs: README (EN/ID), wizard guide, schema, engine notes, Windows notes; CI on Windows, macOS and
   Linux; issue and pull request templates; security policy.
 
-[Unreleased]: https://github.com/OWNER/house-3d-studio/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/OWNER/house-3d-studio/releases/tag/v0.1.0
+[Unreleased]: https://github.com/halogass/house-3d-studio/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/halogass/house-3d-studio/releases/tag/v0.1.0
