@@ -1,0 +1,48 @@
+{
+  "name": "sample-house",
+  "title": { "id": "Rumah Contoh", "en": "Sample House" },
+  "language": "id",
+  "location": {
+    "city": "Bandung",
+    "region": "jawa-barat-2026",
+    "lat": -6.9,
+    "lon": 107.6,
+    "climate": "tropical highland, 18–29 °C"
+  },
+  "features": {
+    "doors": true,
+    "sit": true,
+    "lift": false,
+    "cars": true,
+    "multiplayer": true,
+    "spec": true,
+    "cost": true,
+    "bake": false,
+    "site": true,
+    "garden": true,
+    "pv": true
+  },
+  "style": {
+    "preset": "tropical-modern",
+    "exteriorColor": "#efebe3",
+    "accentColor": "#5b4a3c",
+    "roof": "roofTileDark",
+    "facade": "modern",
+    "trim": "#2f2a26"
+  },
+  "spec": {
+    "occupants": 4,
+    "kwhPerPersonDay": 3.5,
+    "litresPerPersonDay": 150,
+    "rainfallMm": 2200,
+    "runoff": 0.8,
+    "peakSunHours": 4.2,
+    "pvLosses": 0.8,
+    "panelWp": 550
+  },
+  "cost": {
+    "region": "jawa-barat-2026",
+    "quality": "standard"
+  },
+  "start": { "x": 5.6, "y": -3, "yaw": 0 }
+}
