@@ -203,6 +203,12 @@ export function validate(projectRaw, zoningRaw, interiorRaw, { furnitureTypes = 
     if (m.rough !== undefined && !(isNum(m.rough) && m.rough >= 0 && m.rough <= 1)) E(w, '"rough" (kekasaran) harus 0–1.', '"rough" (roughness) must be 0–1.');
     if (m.texture === undefined && m.color === undefined) W(w, 'Tanpa "texture" atau "color" material ini putih polos.', 'Without "texture" or "color" this material is plain white.');
   }
+  // cost adjustments (engine/cost/rates/index.js withProject)
+  const cost = p.cost || {};
+  if (cost.index !== undefined && !(isNum(cost.index) && cost.index >= 0.5 && cost.index <= 2)) E('project.json cost.index', '"index" (indeks harga daerah) harus angka 0,5–2, mis. 0.88.', '"index" (regional price index) must be a number 0.5–2, e.g. 0.88.');
+  if (typeof cost.region === 'number') W('project.json cost.region', '"region" adalah nama tabel harga (mis. "jawa-barat-2026"); indeks harga daerah ditulis di "index".', '"region" is the rate table name (e.g. "jawa-barat-2026"); put a regional price index in "index".');
+  for (const [k, v] of Object.entries(cost.rates || {})) if (!(isNum(v) && v >= 0)) E(`project.json cost.rates.${k}`, 'Harga satuan harus angka (Rupiah per satuan).', 'A unit rate must be a number (IDR per unit).');
+  for (const [i, e] of (Array.isArray(cost.extra) ? cost.extra : []).entries()) if (!e || !e.n || !isNum(e.qty) || !isNum(e.r)) E(`project.json cost.extra[${i}]`, 'Butuh "n" (nama), "u" (satuan), "qty" (jumlah) dan "r" (harga satuan).', 'Needs "n" (name), "u" (unit), "qty" (quantity) and "r" (unit rate).');
   const matOk = (v) => !isMaterial || isMaterial(v) || !!custom[v];
   if (p.style?.door !== undefined && !matOk(p.style.door)) E('project.json style.door', `"${p.style.door}" bukan nama material (lihat docs/SCHEMA.md "Material names", mis. "walnut", "teak", "lacquer:#f2efe7").`, `"${p.style.door}" is not a material name (see docs/SCHEMA.md "Material names", e.g. "walnut", "teak", "lacquer:#f2efe7").`);
   if (p.style?.roof !== undefined && !matOk(p.style.roof)) E('project.json style.roof', `"${p.style.roof}" bukan material atap. Pilih: terracotta, roofTileDark, roofMetal, roofMetalLight.`, `"${p.style.roof}" is not a roof material. Pick: terracotta, roofTileDark, roofMetal, roofMetalLight.`);

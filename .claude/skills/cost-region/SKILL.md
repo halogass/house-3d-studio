@@ -18,8 +18,9 @@ Re-run after any plan change; mention if the cost page is older than the plan.
 - Ask: region (province/city or country), quality (simple / medium / premium), builder type
   (contractor with overhead + profit / small builder / self-managed), year, what is included (land,
   permits, furniture, appliances, solar, landscaping, design fees, VAT/tax).
-- Adapting:
-  1. Start from the template's base rates.
+- Adapting — **in `project.json` → `cost` only** (`index`, `rates`, `extra`, `label`, `range`; format in
+  `docs/SCHEMA.md` → *A city without its own table*). Never edit `engine/cost/rates/` for one house.
+  1. Start from the nearest table's base rates (`cost.region`).
   2. Apply a regional factor: ask the user if they know a local price per m² for a typical house of this
      quality; derive the factor from it. If they don't know, use a clearly labelled assumption and ask them
      to confirm with a local contractor.

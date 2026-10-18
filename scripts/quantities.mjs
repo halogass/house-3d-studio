@@ -9,11 +9,11 @@ import { buildHeadless } from './lib/headless.mjs';
 const { dir, built, Z, PROJECT, INTERIOR } = await buildHeadless({ dynamicDoors: true });
 const { computeQuantities } = await import('../engine/cost/quantities.js');
 const { calc, defaults } = await import('../engine/cost/calc.js');
-const { ratesFor, DEFAULT_REGION, RATES } = await import('../engine/cost/rates/index.js');
+const { ratesFor, DEFAULT_REGION, RATES, withProject } = await import('../engine/cost/rates/index.js');
 
 const Q = computeQuantities({ Z, PROJECT, INTERIOR, energy: built.energy, trees: built.trees.length });
 const regionId = PROJECT.cost?.region || DEFAULT_REGION;
-const R = ratesFor(regionId);
+const R = withProject(ratesFor(regionId), PROJECT);
 const E = calc(Q, R, defaults(R, PROJECT));
 const round = (v) => Math.round(v);
 const estimate = {

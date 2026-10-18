@@ -7,7 +7,7 @@ import { LEVELS } from '../engine/config.js';
 import { t, tr, getLang, setLang, applyI18n, LANGS } from '../engine/i18n.js';
 import { computeQuantities } from '../engine/cost/quantities.js';
 import { calc, defaults, QUALITIES } from '../engine/cost/calc.js';
-import { RATES, DEFAULT_REGION, ratesFor } from '../engine/cost/rates/index.js';
+import { RATES, DEFAULT_REGION, ratesFor as tableFor, withProject } from '../engine/cost/rates/index.js';
 
 const $ = (id) => document.getElementById(id);
 const loc = getLang() === 'id' ? 'id-ID' : 'en-GB';
@@ -18,6 +18,8 @@ const rp = (v) => 'Rp ' + num(Math.round(v));
 
 const Q = computeQuantities({ Z, PROJECT, INTERIOR });
 const wanted = PROJECT.cost?.region || DEFAULT_REGION;
+// the project's own adjustments (project.json cost.rates / extra / label) apply to its own table
+const ratesFor = (id) => (id === (RATES[wanted] ? wanted : DEFAULT_REGION) ? withProject(tableFor(id), PROJECT) : tableFor(id));
 let R = ratesFor(wanted);
 let A = defaults(R, PROJECT);
 

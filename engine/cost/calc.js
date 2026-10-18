@@ -14,6 +14,9 @@ export function defaults(R, project = {}) {
   const A = { ...R.DEFAULTS };
   if (QUALITIES.includes(project?.cost?.quality)) A.quality = project.cost.quality;
   for (const k of ['region', 'fee', 'cont', 'ppn', 'range']) if (typeof project?.cost?.[k] === 'number') A[k] = project.cost[k];
+  // project.json cost.index: regional price index against the table's own region (cost.region is
+  // the table id, a string), e.g. 0.88 for a cheaper city than the table's
+  if (typeof project?.cost?.index === 'number') A.region = project.cost.index;
   return A;
 }
 

@@ -81,6 +81,7 @@ the design notes). Text shown to people may be a plain string or `{ id: 'Bahasa 
 | `materials` | the house's own materials, usable wherever a material name is asked (floors, furniture `mat`, roofs …): `{ "<name>": { "texture": "<folder>", "size": 0.6, "color": "#ffffff", "rough": 0.8, "metal": 0, "maps": ["diff"] } }` — see *The house's own textures* below. A colour-only material (`{ "color": "#7a5236", "rough": 0.6 }`) needs no texture |
 | `spec.*` | household assumptions for the spec tab (energy and water) |
 | `cost.region`, `cost.quality` | rate table key and `'standard' \| 'premium' \| 'luxury'`; optional `fee`, `cont`, `ppn`, `range` (%) override the table defaults |
+| `cost.index`, `cost.rates`, `cost.extra`, `cost.label` | the house's own cost adjustments, no engine edit needed (see *Cost estimate* → *A city without its own table*) |
 | `start` | optional start position `{ x, y, yaw (radians), level }`; default: on the road in front of the first gate |
 | `bake.areas` | optional: `[{ id, level, rooms: [...], enclosed, gain: { day, night } }]`; default one bake area per level |
 
@@ -554,7 +555,22 @@ export default {
   `lv`: cost allocation `'gfa' | 'ground' | 'upper' | 'site' | <levelId> | (Q) => weights`;
   `reg: false`: not scaled by the regional price index.
 
-**Add a region**: copy `engine/cost/rates/jawa-barat-2026.js` to `engine/cost/rates/<new-id>.js`,
+**A city without its own table** (the wizard's way): keep the nearest table as `cost.region` and
+adjust it in `project.json`:
+
+```json
+"cost": { "region": "jawa-barat-2026", "quality": "standard", "range": 25,
+          "index": 0.88,
+          "label": { "id": "Yogyakarta (Jawa Barat × 0,88, perkiraan)", "en": "Yogyakarta (West Java × 0.88, estimate)" },
+          "rates": { "wallTile": 175000 },
+          "extra": [{ "id": "bathWallTile", "n": { "id": "Keramik dinding KM", "en": "Bathroom wall tiles" }, "u": "m²", "qty": 38, "r": 185000 }] }
+```
+`index` scales every regional rate (1 = the table's own region); `rates` overrides single items by id
+(see the table file or `quantities.json` for ids), e.g. with a local quote; `extra` adds items the model
+does not measure (a category "Project additions"). The cost page and `npm run quantities` both use them.
+Record which numbers are sourced and which are assumptions in `progress.md`.
+
+**Add a region** (maintainers, for a table everyone can pick): copy `engine/cost/rates/jawa-barat-2026.js` to `engine/cost/rates/<new-id>.js`,
 change `id`, `name`, `note` and the rates, register it in `engine/cost/rates/index.js` (`RATES`), and
 set `"cost": { "region": "<new-id>" }` in project.json. Unknown regions fall back to
 `jawa-barat-2026` with a warning on the page. All figures are **estimates**, not quotations.
