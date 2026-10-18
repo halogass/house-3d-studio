@@ -30,7 +30,11 @@
       "PowerShell(git log*)",
       "Read(./**)",
       "Edit(./projects/**)",
-      "Edit(./docs/wizard/**)"
+      "Edit(./docs/wizard/**)",
+      "Bash(npx playwright-core install chromium)",
+      "PowerShell(npx playwright-core install chromium)",
+      "Bash(git check-ignore *)",
+      "PowerShell(git check-ignore *)"
     ],
     "ask": [
       "Bash(npm run deploy*)",

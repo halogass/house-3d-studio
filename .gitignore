@@ -9,3 +9,5 @@ projects/*/private/
 .DS_Store
 Thumbs.db
 projects/*/shots/
+# which house is active is a per-checkout choice (npm run use-project); defaults to sample-house
+.active-project

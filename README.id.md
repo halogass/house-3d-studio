@@ -118,6 +118,8 @@ claude --version
    claude
    ```
    Pertama kali, Claude Code meminta Anda login dan bertanya apakah folder ini dipercaya: jawab ya.
+   (Ini penting: sebelum folder dipercaya, pengaturan izin repo tidak berlaku dan setiap langkah akan meminta persetujuan.)
+   File denah dan foto Anda boleh tetap di tempatnya, termasuk di folder yang namanya berspasi — wizard menyalinnya ke `projects/<rumah>/private/`.
 4. Ketik **`/rumah-baru`** (atau **`/new-house`** dalam bahasa Inggris) lalu jawab pertanyaannya.
 5. Kapan pun nanti: **`/lanjut`** (`/continue`) melanjutkan dari titik terakhir.
 

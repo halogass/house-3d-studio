@@ -117,6 +117,8 @@ claude --version
    claude
    ```
    The first time, Claude Code asks you to log in and whether you trust this folder: say yes.
+   (This matters: until the folder is trusted, the repo's permission settings don't apply and every step asks for approval.)
+   Your plan and photo files can stay where they are, even in folders with spaces — the wizard copies them into `projects/<house>/private/`.
 4. Type **`/new-house`** (or **`/rumah-baru`** in Indonesian) and answer the questions.
 5. Any time later: **`/continue`** (`/lanjut`) picks up where you stopped.
 
