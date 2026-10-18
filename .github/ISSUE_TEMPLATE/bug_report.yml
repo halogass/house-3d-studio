@@ -1,0 +1,87 @@
+name: Bug report / laporan bug
+description: Something does not work as expected. / Ada yang tidak berjalan semestinya.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Never attach your own floor plan, photos, address, site link or PIN.**
+        Reproduce with `projects/sample-house` if you can (`npm run use-project sample-house`).
+        Terima kasih! **Jangan lampirkan denah, foto, alamat, link situs atau PIN rumah Anda.**
+        Bila bisa, reproduksi dengan `projects/sample-house`.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Apa yang terjadi?
+      description: What you did, what you expected, what happened instead. / Langkah, harapan, hasil.
+      placeholder: |
+        1. npm run dev
+        2. opened the Local link, pressed …
+        3. expected …, but …
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where? / Di mana?
+      multiple: true
+      options:
+        - Wizard (Claude Code commands) / wizard
+        - 3D walk-through / jelajah 3D
+        - 2D plan page / halaman denah 2D
+        - Cost page / halaman biaya
+        - npm scripts (validate, check, test, build …)
+        - Deploy / Vercel / PIN
+        - Multiplayer / jelajah bareng
+        - Lighting bake / bake pencahayaan
+        - Install / instalasi
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system / sistem operasi
+      placeholder: e.g. Windows 11 23H2, macOS 15.5, Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version (`node -v`) / versi Node.js
+      placeholder: v22.19.0
+    validations:
+      required: true
+  - type: input
+    id: shell
+    attributes:
+      label: Terminal / shell
+      placeholder: PowerShell 7, Windows PowerShell 5.1, cmd, bash, zsh, VS Code terminal …
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device / browser dan perangkat
+      placeholder: Chrome 141 on a laptop, Safari on iPhone 15, Edge on a Surface tablet …
+  - type: input
+    id: gpu
+    attributes:
+      label: Graphics card (GPU) / kartu grafis
+      description: Windows Task Manager → Performance → GPU; macOS Apple menu → About This Mac; Linux `lspci | grep -i vga`. Or open chrome://gpu.
+      placeholder: Intel Iris Xe, NVIDIA RTX 3060, Apple M2, unknown …
+  - type: input
+    id: claude
+    attributes:
+      label: Claude Code version (`claude --version`), if the wizard is involved
+      placeholder: 2.1.x
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error messages / pesan error
+      description: Terminal output or the browser console (F12 → Console). Remove anything personal first. / Hapus data pribadi dulu.
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy / privasi
+      options:
+        - label: I removed personal data (plans, photos, address, site link, PIN, keys). / Data pribadi sudah saya hapus.
+          required: true

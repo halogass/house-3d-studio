@@ -1,0 +1,34 @@
+name: Feature request / usulan fitur
+description: An idea to make the template better. / Ide untuk memperbaiki template.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do? / Apa yang ingin Anda lakukan?
+      description: Describe the need, not only the solution ("I want to show my parents the view from the balcony at sunset"). / Jelaskan kebutuhannya.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could it work? / Bagaimana cara kerjanya?
+      description: A wizard command, an option in the 3D view, a new room or furniture type, a cost region …
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / bagian
+      options:
+        - Wizard (Claude Code) / wizard
+        - 3D walk-through / jelajah 3D
+        - 2D plan / denah 2D
+        - Cost and spec / biaya dan spesifikasi
+        - Furniture and materials / furnitur dan material
+        - Deploy and sharing / deploy dan berbagi
+        - Docs / dokumentasi
+        - Other / lainnya
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else? / Lainnya?
+      description: Links or pictures of examples (not of your own house). / Contoh (bukan rumah Anda sendiri).
