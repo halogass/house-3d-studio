@@ -166,7 +166,9 @@ const LEGACY = {
 
   // Roofs & exterior
   terracotta: { set: 'roofTiles', canvas: 'terracotta', r: 1 },
-  roofTileDark: { set: 'roofTiles', canvas: 'terracotta', c: 0x6d6a6a, r: 1 },  // grey / charcoal concrete tiles
+  // grey / charcoal concrete tiles: the tile relief (normal + roughness) of the photo set, but not
+  // its red-brown colour map — multiplying terracotta by grey still looked brown
+  roofTileDark: { set: 'roofTiles', noMap: true, c: 0x4f4d4b, r: 1 },
   roofMetal: { c: 0x3a3e43, r: 0.42, m: 0.55 },                                 // standing-seam metal
   roofMetalLight: { c: 0xb9bdbf, r: 0.38, m: 0.6 },                             // zincalume / light metal
   roofDeck: { set: 'gravel', canvas: 'gravel', r: 1 },
@@ -334,11 +336,12 @@ export function makeMaterials(renderer, { pbr = true, lite = false, deferTexture
       // 1 px stand-in maps look exactly like no maps, and when the photos arrive only the textures
       // are swapped, so no shader is rebuilt mid-walk (lite sets have no normal / roughness maps)
       if (pbr) {
-        if (!mat.map) mat.map = placeholder('map');
+        if (!mat.map && !def.noMap) mat.map = placeholder('map');
         if (!lite) { mat.normalMap = placeholder('normal'); mat.roughnessMap = placeholder('rough'); }
       }
       photoSet(setName)?.then((t) => {
         if (!t) return;
+        if (def.noMap) t = { ...t, map: null };
         const rebuild = !mat.map !== !t.map || !mat.normalMap !== !t.normalMap || !mat.roughnessMap !== !t.roughnessMap;
         mat.map = t.map;
         mat.normalMap = t.normalMap;

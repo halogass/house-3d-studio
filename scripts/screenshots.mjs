@@ -5,13 +5,20 @@
 //   node scripts/screenshots.mjs --only plan,street,rooms --rooms living,master --time 16 --mobile
 // Views:
 //   street      the house from the road, where a visitor starts
+//   entrance    eye level, 3.5 m in front of the main entrance door, facing it
+//   garden      eye level from the back of the plot, looking at the house
 //   aerial      dollhouse overview of the whole plot from the south-east
 //   cut-<lv>    dollhouse cut at each level (roof and upper floors hidden)
-//   room-<id>   standing in each room (or --rooms a,b), looking along its longer side
+//   room-<id>   standing in each room (or --rooms a,b) just inside its widest door, looking at the far corner
 //   plan-<lv>   the 2D plan of each level (studio/plan.html) + plan-site
 //   mobile      a phone-sized view of the street (with --mobile, or in "all")
-// Options: --time 9.5 (hour), --month 7, --quality high|ultra|low, --width 1280 --height 800,
-//          --out <dir>, --port <n>. Without a GPU the pictures still come out (slowly, software).
+// Options: --time 9.5 (hour; 18.5 = dusk, 20 = night), --month 7, --quality high|ultra|low,
+//          --width 1280 --height 800, --out <dir> (relative to the repo, or absolute), --port <n>,
+//          --prefix dusk- (prefix every file name, e.g. for a night set).
+// One extra view of your own (no script needed):
+//   --at x,y[,level[,yawDeg[,pitchDeg]]] --name garden-west    eye level (yaw 0 = north, 90 = east)
+//   --cam x,y,h,tx,ty,th --name aerial-low                      dollhouse camera at (x,y,h) looking at (tx,ty,th)
+// Without a GPU the pictures still come out (slowly, software).
 import { createServer } from 'vite';
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -50,7 +57,7 @@ async function shot(file, url, { mobile = false, plan = false } = {}) {
     await page.waitForFunction(() => window.__dh && !document.getElementById('loading') && window.__dh.build?.doneAt, null, { timeout: 120000 });
     await page.waitForTimeout(2500); // textures, photo plants
   }
-  const path = join(out, file);
+  const path = join(out, (arg('prefix') || '') + file);
   await page.screenshot({ path });
   saved.push(path);
   await ctx.close();
@@ -62,7 +69,34 @@ try {
   await page.close();
   console.log(`GPU: ${gpu.name}${gpu.software ? ' (software rendering: slow)' : ''}`);
   const site = Z.site, cx = site.w / 2, cy = site.d / 2;
+  if (arg('at') || arg('cam')) { // one custom view only
+    const file = (arg('name') || 'view').replace(/[^a-z0-9-]+/gi, '-') + '.png';
+    await shot(file, arg('at') ? `?${common}&at=${arg('at')}` : `?${common}&mode=house&cam=${arg('cam')}`);
+    throw null; // done: skip the fixed views
+  }
   if (want('street')) await shot('street.png', `?${common}`);
+  // entrance: the widest door in an outside wall that faces the road (else any outside door)
+  const ground = Z.floors[GROUND] || [];
+  const inside = (x, y) => ground.some((r) => x > r.r[0] && x < r.r[2] && y > r.r[1] && y < r.r[3]);
+  const ROAD = { s: [0, -1], n: [0, 1], e: [1, 0], w: [-1, 0] }[site.road || 's'] || [0, -1];
+  const outsideDoors = (Z.openings[GROUND] || []).filter((o) => DOOR_TYPES.has(o.t)).map((o) => {
+    const h = o.o === 'h', mx = h ? o.x + o.w / 2 : o.x, my = h ? o.y : o.y + o.w / 2;
+    const normals = h ? [[0, 1], [0, -1]] : [[1, 0], [-1, 0]];
+    const n = normals.find(([nx, ny]) => !inside(mx + nx * 0.3, my + ny * 0.3) && inside(mx - nx * 0.3, my - ny * 0.3));
+    return n && { o, mx, my, n, road: n[0] === ROAD[0] && n[1] === ROAD[1] };
+  }).filter(Boolean).sort((a, b) => (b.road - a.road) || (b.o.w - a.o.w));
+  if (want('entrance') && outsideDoors.length) {
+    const { mx, my, n } = outsideDoors[0];
+    const x = mx + n[0] * 3.5, y = my + n[1] * 3.5, yaw = Math.round((Math.atan2(-n[0], -n[1]) * 180 / Math.PI + 360) % 360);
+    await shot('entrance.png', `?${common}&at=${x.toFixed(2)},${y.toFixed(2)},${GROUND},${yaw},-3`);
+  }
+  if (want('garden') && ground.length) { // from 2 m inside the back boundary, looking at the house
+    const hx = (Math.min(...ground.map((r) => r.r[0])) + Math.max(...ground.map((r) => r.r[2]))) / 2;
+    const hy = (Math.min(...ground.map((r) => r.r[1])) + Math.max(...ground.map((r) => r.r[3]))) / 2;
+    const [x, y] = { s: [hx, site.d - 2], n: [hx, 2], e: [2, hy], w: [site.w - 2, hy] }[site.road || 's'] || [hx, site.d - 2];
+    const yaw = Math.round((Math.atan2(hx - x, hy - y) * 180 / Math.PI + 360) % 360);
+    await shot('garden.png', `?${common}&at=${x.toFixed(2)},${y.toFixed(2)},${GROUND},${yaw},-6`);
+  }
   // from the south-east, far enough that the whole plot fills about two thirds of the frame
   const span = Math.max(site.w, site.d, 12);
   if (want('aerial')) await shot('aerial.png', `?${common}&mode=house&cam=${(cx + span * 0.48).toFixed(1)},${(cy - span * 0.72).toFixed(1)},${(span * 0.62).toFixed(1)},${cx},${cy},0`);
@@ -101,7 +135,7 @@ try {
   for (const lv of ['site', ...LEVEL_ORDER]) if (want('plan-' + lv)) await shot(`plan-${lv}.png`, `studio/plan.html?level=${lv}&furniture=1&grid=1`, { plan: true });
   if ((!only && !process.argv.includes('--no-mobile')) || process.argv.includes('--mobile') || want('mobile')) await shot('mobile.png', `?${common.replace('quality=high', 'quality=low')}`, { mobile: true });
 } catch (e) {
-  errors.push(e.message);
+  if (e) errors.push(e.message);
 } finally {
   await browser.close();
   await server.close();
