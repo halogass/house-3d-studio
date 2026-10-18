@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="%H3S_LANG%">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>%H3S_TITLE% · Cost</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Cpath d=%27M4 15 16 5l12 10v13H4z%27 fill=%27%23b5532f%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="./studio.css">
+<style>
+  .wrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; max-width: 1320px; margin: 0 auto; padding: 18px 24px 60px; }
+  main { min-width: 0; }
+  aside { position: sticky; top: 12px; align-self: start; max-height: calc(100vh - 24px); overflow-y: auto;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; }
+  h2 { font: 600 22px/1.2 'Cormorant Garamond', Georgia, serif; margin: 0 0 10px; }
+  .warn { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; font-size: 13px; margin-bottom: 18px; border: 1px solid #e6c4b3; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 5px 6px; vertical-align: top; }
+  thead th { font-weight: 600; color: var(--ink-soft); font-size: 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  tbody tr + tr td { border-top: 1px solid var(--line-soft); }
+  tr.sum td { border-top: 1px solid var(--line) !important; font-weight: 600; }
+  tr.grand td { font-weight: 700; color: var(--accent); font-size: 14px; }
+  .scroll { overflow-x: auto; }
+  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; align-items: start; }
+  .total { font: 600 44px/1.05 'Cormorant Garamond', Georgia, serif; color: var(--accent); }
+  .total small { font: 500 14px Inter, sans-serif; color: var(--ink-soft); }
+  .rangebar { position: relative; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--bar-soft), var(--bar), var(--bar-soft)); margin: 10px 0 2px; }
+  .rangebar i { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+  .rangelbl { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tile { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fffdf9; }
+  .tile .k { font-size: 12px; color: var(--ink-soft); } .tile .v { font: 600 21px/1.15 'Cormorant Garamond', Georgia, serif; }
+  .hbars { display: grid; grid-template-columns: minmax(120px, 34%) 1fr auto; gap: 4px 10px; align-items: center; font-size: 13px; }
+  .hbars .track { height: 12px; position: relative; } .hbars .track b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--bar); border-radius: 3px; }
+  .hbars .val { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  details.cat { border-top: 1px solid var(--line-soft); }
+  details.cat:first-of-type { border-top: 0; }
+  details.cat > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 18px 1fr auto; gap: 4px 12px; align-items: baseline; padding: 9px 2px; }
+  details.cat > summary::-webkit-details-marker { display: none; }
+  details.cat > summary::before { content: '▸'; color: var(--ink-soft); transition: transform .15s; }
+  details.cat[open] > summary::before { transform: rotate(90deg); }
+  details.cat .cn { font-weight: 600; } details.cat .body { padding: 0 0 12px 18px; }
+  .field { margin: 10px 0; }
+  .field label { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; font-weight: 500; margin-bottom: 4px; }
+  .field label output { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .field input[type=range] { width: 100%; accent-color: var(--accent); }
+  .field select { width: 100%; font: 14px Inter, sans-serif; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .seg button { font: 500 12.5px Inter, sans-serif; border: 0; background: transparent; padding: 7px 4px; cursor: pointer; color: var(--ink); }
+  .seg button.on { background: var(--ink); color: var(--paper); }
+  .hint { font-size: 11.5px; color: var(--ink-soft); margin-top: 3px; }
+  @media (max-width: 1060px) { .wrap { grid-template-columns: 1fr; padding: 14px 16px 50px; } aside { position: static; max-height: none; order: -1; } }
+  @media (max-width: 720px) { .hero, .tiles { grid-template-columns: 1fr; } .total { font-size: 36px; } header.top { padding: 14px 16px 10px; } }
+  @media print { aside, header .links { display: none; } .wrap { grid-template-columns: 1fr; } details.cat { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1 id="title">%H3S_TITLE%</h1> <span class="badge" data-i18n="estimateBadge">ESTIMATE</span>
+  <div class="meta" id="meta"></div>
+  <div class="links">
+    <select id="lang" class="btn"></select>
+    <a class="btn" href="../index.html" data-i18n="open3d">3D ↗</a>
+    <a class="btn" href="plan.html" data-i18n="openPlan">2D ↗</a>
+  </div>
+</header>
+<div class="wrap">
+  <main>
+    <div class="warn" data-i18n="costDisclaimer"></div>
+    <div class="warn" id="regionWarn" hidden></div>
+    <section>
+      <div class="hero">
+        <div>
+          <div class="muted" data-i18n="costTotal"></div>
+          <div class="total" id="total"></div>
+          <div class="muted" id="perM2"></div>
+          <div class="rangebar"><i></i></div>
+          <div class="rangelbl"><span id="low"></span><span data-i18n="costRange"></span><span id="high"></span></div>
+        </div>
+        <div class="tiles" id="tiles"></div>
+      </div>
+    </section>
+    <section><h2 data-i18n="costByCat"></h2><div class="hbars" id="catBars"></div></section>
+    <section><h2 data-i18n="costByLevel"></h2><div class="hbars" id="lvBars"></div></section>
+    <section><h2 data-i18n="costDrivers"></h2><div class="hbars" id="drivers"></div></section>
+    <section><div id="cats"></div></section>
+    <section><h2 data-i18n="costQuantities"></h2><div class="scroll"><table id="qty"></table></div></section>
+  </main>
+  <aside>
+    <h2 data-i18n="costAssumptions"></h2>
+    <div class="field"><label data-i18n="costRegion"></label><select id="region"></select><div class="hint" id="regionNote"></div></div>
+    <div class="field"><label data-i18n="costQuality"></label><div class="seg" id="quality"></div></div>
+    <div class="field"><label><span data-i18n="costRegionIndex"></span><output id="regionOut"></output></label><input id="regionIdx" type="range" min="0.8" max="1.4" step="0.01"><div class="hint" data-i18n="costRegionHint"></div></div>
+    <div class="field"><label><span data-i18n="costFeePct"></span><output id="feeOut"></output></label><input id="fee" type="range" min="0" max="12" step="0.5"></div>
+    <div class="field"><label><span data-i18n="costContPct"></span><output id="contOut"></output></label><input id="cont" type="range" min="0" max="25" step="1"></div>
+    <div class="field"><label><span data-i18n="costPpnPct"></span><output id="ppnOut"></output></label><input id="ppn" type="range" min="0" max="12" step="1"></div>
+    <div class="field"><label><span data-i18n="costRangePct"></span><output id="rangeOut"></output></label><input id="range" type="range" min="5" max="35" step="1"></div>
+  </aside>
+</div>
+<script type="module" src="./cost.js"></script>
+</body>
+</html>
