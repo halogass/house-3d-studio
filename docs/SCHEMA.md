@@ -262,7 +262,7 @@ edges get a balustrade automatically (not where a wall closes them, not where th
 ### lift (optional)
 
 ```js
-lift: { r: [30.7, 28, 32, 30], door: 'w', stops: ['L1', 'L2'] }
+lift: { r: [8.1, 6.15, 9.6, 7.8], door: 'w', stops: ['L1', 'L2'] }
 ```
 Shaft rect (≥ 1.3 × 1.5 m), the side the door is on, the levels it stops at (default all). Put it
 inside or beside a hall; keep 1.5 m free in front of the door. The engine builds the shaft, the car,
