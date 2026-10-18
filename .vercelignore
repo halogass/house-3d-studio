@@ -4,3 +4,5 @@ dist
 projects/*/private/
 projects/*/shots/
 .playwright-mcp
+.github
+docs/images

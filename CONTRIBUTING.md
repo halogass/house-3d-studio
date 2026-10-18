@@ -10,7 +10,8 @@ Thanks for helping! *(Bahasa Indonesia di bawah.)*
   npm install
   npm run validate
   npm run check
-  npm run test
+  npm run check-interior
+  npm test
   npm run build
   ```
   and say in the PR what you tested and what you did not (e.g. "not tested on a phone").
@@ -20,6 +21,10 @@ Thanks for helping! *(Bahasa Indonesia di bawah.)*
   `engine/`); user-facing text in both English and Indonesian.
 - **Wizard changes** (`CLAUDE.md`, `.claude/`): keep commands bilingual, keep the rule "ask in batches
   with options, never invent dimensions silently", and update `docs/WIZARD.md` + `docs/WIZARD.id.md`.
+- **CI** runs the same commands on Windows, macOS and Linux (Node 20, 22, 24) plus a headless browser
+  smoke test (`node .github/scripts/smoke.mjs` after `npm run build`). Add user-visible changes to
+  `CHANGELOG.md` under "Unreleased".
+- **Security problems:** report privately, see [SECURITY.md](SECURITY.md).
 - By contributing you agree your work is released under the MIT licence.
 
 ## Kontribusi (Indonesia)
