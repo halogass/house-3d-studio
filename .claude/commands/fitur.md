@@ -5,7 +5,9 @@ argument-hint: "[nama fitur / feature name] [on|off]"
 
 # /fitur — optional features (stage 6)
 
-Read the feature list and flag names from `docs/SCHEMA.md` (project config) and the current values in the project.
+Flags live in `projects/<house>/project.json` → `features` (names and defaults: `docs/SCHEMA.md`,
+`engine/schema.js` `FEATURES`): `doors`, `sit`, `lift`, `cars`, `multiplayer`, `spec`, `cost`, `bake`,
+`site`, `garden`, `pv` (solar panels), `finishes`, `furniture`. Read the current values first.
 
 Show a numbered table (user's language): feature — what it does — cost/impact — current state:
 1. Core: walk, dollhouse, 2D plan, minimap — always on.

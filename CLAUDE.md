@@ -26,7 +26,8 @@ One copy of this repository = one house. The house lives in `projects/<house>/`.
 4. **Keep their data private.** House plans, addresses, photos, family details and security features are
    personal. Never put them in commits to a public repository, issue texts, logs you share, or web
    requests. Recommend the user's GitHub copy be **Private**. Never upload photos anywhere. Do not ask for
-   the street address or GPS coordinates; a region/city level is enough (for climate, sun and cost).
+   the street address or exact GPS coordinates; city level is enough (for climate, sun and cost) — store
+   `location.lat/lon` rounded to the city centre (1 decimal).
    For security features (cameras, safe rooms, locks) model only what the user asks for and remind them
    that a public link shows the layout to anyone who has the PIN.
 5. **Validate → check → test after every data change.** After editing anything in `projects/<house>/`:
@@ -97,8 +98,8 @@ validate/check/test run.
 
 ## 3. File map
 
-> Names marked † come from the engine (Phase 1A). If a file is missing or named differently, read
-> `docs/SCHEMA.md`, `package.json` and `projects/_template/` and follow those — they win over this table.
+> Names marked † come from the engine. If anything here disagrees with `docs/SCHEMA.md`,
+> `engine/schema.js`, `package.json` or `projects/_template/`, those win over this table.
 
 | Path | What | Who edits |
 |---|---|---|
@@ -110,7 +111,9 @@ validate/check/test run.
 | `projects/<house>/progress.md` | wizard state — **read first, update last** | wizard |
 | `projects/<house>/brief.md` | interview answers in plain language | wizard |
 | `projects/<house>/style.md` | per-room style table + photo rights log | wizard |
-| `projects/<house>/` data files † | levels, rooms, openings, fixtures, interior, exterior/site, features, rates (format: `docs/SCHEMA.md`) | wizard |
+| `projects/<house>/project.json` † | title (`{ id, en }`), language, location (city + region key; lat/lon rounded to city level), `features` flags, `style`, `spec` inputs, `cost` (region + quality), start position | wizard |
+| `projects/<house>/zoning.js` † | the plan: `site` (plot, road side, perimeter, site items), levels, rooms, openings, fixtures, stairs, roofs | wizard |
+| `projects/<house>/interior.js` † | finishes + furniture per room (`rooms`), furniture outside (`areas`) | wizard |
 | `projects/<house>/private/` | user's plan scans (`private/plans/`) and inspiration photos (`private/inspo/`); git-ignored, never deployed | user + wizard |
 | `projects/<house>/shots/` | screenshots from `qa-visual` | wizard |
 | `docs/SCHEMA.md` † | data format — the contract for every data edit | — |
@@ -144,6 +147,7 @@ All commands are run from the repository root and are identical in PowerShell an
 | `npm run bake` | photoreal light bake (GPU only; long) |
 | `npm run deploy` | deploy to Vercel (wraps `npx vercel`) |
 
+Every Node script also accepts `--project <name>` to work on a non-active project.
 Passing flags: prefer `node scripts/<name>.mjs --flag value` over `npm run <name> -- --flag value`,
 because Windows PowerShell can swallow the `--` (see `docs/WINDOWS.md`).
 

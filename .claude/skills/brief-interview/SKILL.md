@@ -16,7 +16,8 @@ and "number of adults/children" are enough.
 2. Plan input: photo/scan/PDF of a plan · hand sketch · no plan (design from the interview).
 3. Plot size (W × D m) and which side faces the road. Default: 12 × 20 m, road south.
 4. Climate/region (city or province level): tropical lowland · tropical highland · temperate · other.
-   (Used for sun, ventilation advice, and later cost.)
+   (Used for sun, ventilation advice, and later cost. Store in `project.json` → `location` with lat/lon
+   rounded to the city centre — never the plot's exact position.)
 5. Number of floors: 1 · 2 (default) · 3 · plus basement.
 
 ## Batch 2 — people & rooms / penghuni & ruang

@@ -10,7 +10,9 @@ description: Produce an honest, region-adapted construction cost estimate and sp
 Re-run after any plan change; mention if the cost page is older than the plan.
 
 ## 2. Rate table
-- The project's rate file (see `docs/SCHEMA.md`, copied from the template) has rates per unit (m², m, item,
+- The project picks a rate table with `project.json` → `cost.region` (e.g. a key like `<region>-<year>`)
+  and `cost.quality`; where the rate tables live and how to add a region is in `docs/SCHEMA.md`.
+  A rate table has rates per unit (m², m, item,
   lump sum) with fields like region, year, currency, source, confidence. Never silently reuse rates from a
   different region.
 - Ask: region (province/city or country), quality (simple / medium / premium), builder type
