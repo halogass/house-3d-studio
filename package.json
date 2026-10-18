@@ -1,0 +1,38 @@
+{
+  "name": "house-3d-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Design your own house step by step with Claude Code and walk through it in 3D in the browser.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/preview.mjs",
+    "validate": "node scripts/validate.mjs",
+    "check": "node scripts/check.mjs",
+    "check-interior": "node scripts/check-interior.mjs",
+    "test": "node scripts/test.mjs",
+    "quantities": "node scripts/quantities.mjs",
+    "textures": "node scripts/textures.mjs",
+    "bake": "node scripts/bake.mjs",
+    "screenshots": "node scripts/screenshots.mjs",
+    "new-project": "node scripts/new-project.mjs",
+    "use-project": "node scripts/use-project.mjs",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.1",
+    "@vercel/functions": "3.10.1",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "playwright-core": "1.63.0",
+    "sharp": "0.34.5",
+    "three-mesh-bvh": "0.9.16",
+    "vite": "8.3.4"
+  }
+}

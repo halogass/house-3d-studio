@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="%H3S_LANG%">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>%H3S_TITLE% · 3D</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Cpath d=%27M4 15 16 5l12 10v13H4z%27 fill=%27%23b5532f%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --paper: rgba(251, 248, 242, 0.92);
+    --ink: #3a3028;
+    --soft: #7a6c5f;
+    --line: #ddd2c1;
+    --accent: #b5532f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1d1b19; font: 14px/1.45 Inter, system-ui, sans-serif; color: var(--ink); }
+  #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.18); backdrop-filter: blur(6px); }
+  .hidden { display: none !important; }
+  .noui #top, .noui #menuBtn, .noui #menu, .noui #mm, .noui #place, .noui #start, .noui #crosshair, .noui #interact, .noui #bgLoad { display: none !important; }
+
+  #top { position: fixed; top: 12px; left: 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  #title { padding: 8px 12px; }
+  #title h1 { margin: 0; font: 600 20px/1.1 'Cormorant Garamond', Georgia, serif; }
+  #title a { color: var(--accent); font-size: 12px; text-decoration: none; display: block; }
+  .seg { display: flex; gap: 4px; padding: 4px; }
+  .seg button {
+    font: 500 13px Inter, sans-serif; color: var(--ink); background: transparent; border: 0;
+    border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  .seg button.on { background: var(--ink); color: #fbf8f2; }
+
+  #bgLoad { position: fixed; top: 54px; right: 14px; padding: 2px 8px; border-radius: 8px; font: 500 11px Inter, sans-serif; color: var(--soft); background: rgba(251,248,242,.7); pointer-events: none; }
+  #menuBtn { position: fixed; top: 12px; right: 12px; padding: 8px 14px; cursor: pointer; font: 600 13px Inter, sans-serif; color: var(--ink); }
+  #menu { position: fixed; top: 56px; right: 12px; width: 280px; padding: 14px; display: none; max-height: calc(100% - 70px); overflow-y: auto; }
+  #menu.open { display: block; }
+  #menuTabs { display: flex; gap: 4px; margin: -4px 0 12px; padding: 3px; background: rgba(58,48,40,.07); border-radius: 10px; }
+  #menuTabs button { flex: 1; font: 600 13px Inter, sans-serif; color: var(--soft); background: none; border: 0; border-radius: 8px; padding: 7px 0; cursor: pointer; }
+  #menuTabs button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  #menu #tabCtl > label:first-child { margin-top: 0; }
+  #tabSpec h4 { font: 600 15px 'Cormorant Garamond', Georgia, serif; margin: 14px 0 6px; color: var(--ink); }
+  #tabSpec h4:first-child { margin-top: 0; }
+  #tabSpec table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  #tabSpec th { text-align: left; font-weight: 500; color: var(--soft); padding: 4px 8px 4px 0; vertical-align: top; width: 44%; }
+  #tabSpec td { color: var(--ink); padding: 4px 0; border-bottom: 1px solid rgba(58,48,40,.08); }
+  #tabSpec td i { color: #a07a3c; font-size: 10.5px; font-style: normal; border: 1px solid #d8c39a; border-radius: 4px; padding: 0 3px; }
+  #tabSpec p.note { font-size: 11px; margin: 6px 0 0; }
+  #tabSpec details { margin-top: 6px; font-size: 12px; color: var(--soft); }
+  #tabSpec summary { cursor: pointer; }
+  #menu.spec { width: 340px; }
+
+  #menu label { display: block; font-size: 12px; color: var(--soft); margin: 10px 0 4px; }
+  #menu label:first-child { margin-top: 0; }
+  #menu select, #menu input[type=range] { width: 100%; font: 14px Inter, sans-serif; }
+  #menu select { padding: 6px; border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+  #menu .row { display: flex; justify-content: space-between; align-items: baseline; }
+  #menu p { font-size: 12px; color: var(--soft); margin: 12px 0 0; }
+  #menu .warn { color: #b3261e; }
+  #menu a { color: var(--accent); }
+  #dataErr { position: fixed; inset: 0; z-index: 9; background: #f6f1e7; overflow: auto; padding: 24px; font: 14px/1.5 Inter, system-ui, sans-serif; color: var(--ink); }
+  #dataErr h2 { font: 600 24px 'Cormorant Garamond', Georgia, serif; margin: 0 0 12px; }
+  #dataErr li { margin: 8px 0; } #dataErr code { background: #ece4d6; padding: 1px 4px; border-radius: 4px; }
+  #mp { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .mpRow { display: flex; gap: 6px; margin-top: 6px; }
+  .mpRow input { flex: 1; min-width: 0; font: 14px Inter, sans-serif; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
+  .mpRow input[type=color] { flex: 0 0 40px; padding: 2px; }
+  .mpRow button { flex: 1; font: 600 12px Inter, sans-serif; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 8px; padding: 7px 6px; cursor: pointer; }
+  #mp p { margin: 6px 0 0; }
+  #mpHud { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); padding: 6px 12px; font-size: 12px; font-weight: 600; max-width: calc(100% - 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 700px) { #mpHud { top: auto; bottom: 54px; max-width: calc(100% - 24px); } }
+
+  #mm { position: fixed; left: 12px; bottom: 12px; padding: 6px; }
+  #minimap { width: 200px; height: 200px; display: block; border-radius: 8px; cursor: crosshair; }
+  #mmLevels { display: flex; gap: 2px; padding: 4px 0 0; }
+  #mmLevels button { flex: 1; font: 500 11px Inter, sans-serif; border: 0; border-radius: 6px; padding: 4px 0; background: transparent; color: var(--ink); cursor: pointer; }
+  #mmLevels button.on { background: var(--ink); color: #fbf8f2; }
+
+  #place { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); padding: 8px 16px; font-weight: 600; white-space: nowrap; max-width: calc(100% - 260px); overflow: hidden; text-overflow: ellipsis; }
+
+  #liftUI { position: fixed; right: 12px; bottom: 12px; padding: 8px; display: flex; gap: 6px; align-items: center; }
+  #liftUI.hidden, #liftUI .hidden { display: none !important; }
+  #liftFloors { display: flex; gap: 6px; align-items: center; }
+  #liftFloors span { font-size: 12px; color: var(--soft); margin-right: 4px; }
+  #liftUI button { font: 600 13px Inter, sans-serif; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 8px; padding: 8px 10px; cursor: pointer; }
+  #start { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  #start .panel { padding: 18px 22px; text-align: center; max-width: 360px; }
+  #start b { font: 600 22px 'Cormorant Garamond', Georgia, serif; display: block; margin-bottom: 6px; }
+  #crosshair { position: fixed; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: rgba(255,255,255,.75); box-shadow: 0 0 2px rgba(0,0,0,.6); pointer-events: none; }
+
+  /* Interaction prompt (duduk / berbaring / tombol lift), Roblox-style */
+  #interact { position: fixed; left: 50%; top: calc(50% + 34px); transform: translateX(-50%); display: flex; gap: 8px; pointer-events: none; }
+  #interact.hidden { display: none; }
+  #interact button { pointer-events: auto; display: flex; align-items: center; gap: 8px; font: 600 14px Inter, sans-serif; color: var(--ink); background: rgba(251,248,242,.94); border: 1px solid var(--line); border-radius: 22px; padding: 7px 14px 7px 7px; box-shadow: 0 2px 10px rgba(0,0,0,.18); cursor: pointer; }
+  #interact kbd { display: inline-grid; place-items: center; min-width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font: 700 13px Inter, sans-serif; }
+  .touch #interact { top: auto; bottom: 96px; }
+  /* long-press on on-screen controls must not select their labels or open the callout */
+  .touch #interact, .touch #interact *, .touch #liftUI, .touch #liftUI *, .touch #mode, .touch #mode *, .touch #mmLevels, .touch #mmLevels *, .touch canvas { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .touch #interact button { font-size: 16px; padding: 10px 18px 10px 10px; }
+  .touch #interact kbd { display: none; }
+  #crosshair.target { width: 10px; height: 10px; margin: -5px; background: #ffd27a; }
+  #stick { position: fixed; width: 120px; height: 120px; border-radius: 50%; border: 2px solid rgba(255,255,255,.6); background: rgba(0,0,0,.12); display: none; pointer-events: none; }
+  #knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.7); }
+
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; background: #f6f1e7; z-index: 5; }
+  #loading .box { display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 320px; padding: 16px; text-align: center; }
+  #loading b { font: 600 22px 'Cormorant Garamond', Georgia, serif; color: var(--ink); }
+  #loading span { font: 13px Inter, sans-serif; color: var(--soft); }
+  #loading button { font: 600 14px Inter, sans-serif; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 8px; padding: 9px 16px; cursor: pointer; }
+
+  @media (max-width: 700px) {
+    #title h1 { font-size: 17px; }
+    #mm { left: auto; right: 12px; bottom: auto; top: 56px; }
+    #minimap { width: 130px; height: 130px; }
+    #menu { top: 56px; width: calc(100% - 24px); }
+    #place { max-width: calc(100% - 24px); bottom: 12px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div id="crosshair"></div>
+<div id="interact" class="hidden"></div>
+
+<div id="top">
+  <div id="title" class="panel">
+    <h1 id="titleText">%H3S_TITLE%</h1>
+    <a href="studio/plan.html" target="_blank" data-i18n="openPlan">Open 2D plan ↗</a>
+  </div>
+  <div id="mode" class="panel seg">
+    <button data-mode="walk" class="on" data-i18n="walk">Walk</button>
+    <button data-mode="house" data-i18n="dollhouse">Dollhouse</button>
+  </div>
+  <div id="cut" class="panel seg hidden"></div>
+</div>
+
+<button id="menuBtn" class="panel" data-i18n="options">☰ Options</button>
+<div id="bgLoad" class="hidden"></div>
+<div id="menu" class="panel">
+  <div id="menuTabs"><button data-tab="tabCtl" class="on" data-i18n="tabControls">Controls</button><button data-tab="tabSpec" data-i18n="tabSpec">House spec</button></div>
+  <div id="tabCtl">
+  <label for="preset" data-i18n="goTo">Go to</label>
+  <select id="preset"><option disabled selected data-i18n="pickPlace">Pick a place…</option></select>
+  <div class="row"><label for="time" data-i18n="time">Time</label><b id="timeLabel"></b></div>
+  <input id="time" type="range" min="5.5" max="19" step="0.25">
+  <label for="month" data-i18n="month">Month (sun position)</label>
+  <select id="month"></select>
+  <label for="quality" data-i18n="quality">Graphics quality</label>
+  <select id="quality">
+    <option value="ultra" data-i18n="qUltra">Ultra</option>
+    <option value="high" data-i18n="qHigh">High</option>
+    <option value="low" data-i18n="qLow">Light</option>
+  </select>
+  <label for="lang" data-i18n="language">Language</label>
+  <select id="lang"></select>
+  <div id="mp">
+    <label data-i18n="explore">Explore together</label>
+    <div class="mpRow"><input id="mpName" data-i18n-ph="yourName" maxlength="16"><input id="mpColor" type="color" value="#b5532f" data-i18n-title="avatarColor"></div>
+    <div id="mpJoin">
+      <div class="mpRow"><button id="mpCreate" data-i18n="createRoom">Create room</button></div>
+      <div class="mpRow"><input id="mpCode" data-i18n-ph="roomCode" maxlength="6"><button id="mpJoinBtn" data-i18n="join">Join</button></div>
+    </div>
+    <div id="mpJoined" class="hidden">
+      <div class="mpRow"><input id="mpLink" readonly><button id="mpCopy" data-i18n="copyLink">Copy link</button></div>
+      <div class="mpRow"><button id="mpVoice" data-i18n="voiceOn">🎙 Voice</button><button id="mpFollow" data-i18n="follow">Follow (F)</button><button id="mpPing" data-i18n="ping">Mark (Q)</button></div>
+      <div class="mpRow"><button id="mpLeave" data-i18n="leaveRoom">Leave room</button></div>
+    </div>
+    <p id="mpStatus"></p><p id="mpPeers"></p><p id="mpMode"></p>
+  </div>
+  <p id="help"></p>
+  <p class="gpu"><span data-i18n="gpu">GPU</span>: <b id="gpuName">…</b> · <span id="gpuFps"></span><br><span data-i18n="gpuAuto"></span></p>
+  <p id="gpuWarn" class="warn hidden" data-i18n="gpuWarn"></p>
+  <p id="builtFrom"></p>
+  <p id="costLink"><a href="studio/cost.html" target="_blank" data-i18n="openCost">Construction cost estimate ↗</a></p>
+  </div>
+  <div id="tabSpec" class="hidden"></div>
+</div>
+
+<div id="mm" class="panel">
+  <canvas id="minimap" width="400" height="400"></canvas>
+  <div id="mmLevels"></div>
+</div>
+
+<div id="place" class="panel"></div>
+<div id="mpHud" class="panel hidden"></div>
+<div id="liftUI" class="panel hidden">
+  <div id="liftFloors"></div>
+  <button id="liftCall" data-i18n="liftCall">Call lift (E)</button>
+</div>
+<div id="start"><div class="panel"><b data-i18n="clickToWalk">Click to start walking</b><span data-i18n="clickHint"></span></div></div>
+<div id="stick"><div id="knob"></div></div>
+<div id="loading"><div class="box"><b id="loadTitle">…</b><span id="loadMsg"></span></div></div>
+
+<script>
+// Boot guard: if the app file fails to download (flaky connection) or startup throws, say so and
+// retry instead of leaving "Building the house…" up forever. Runs before the app: its own texts.
+(function () {
+  var L = 'en';
+  try { L = new URLSearchParams(location.search).get('lang') || localStorage.getItem('h3s-lang') || '%H3S_LANG%'; } catch (e) { L = '%H3S_LANG%'; }
+  if (L !== 'id' && L !== 'en') L = /^id|^ms/i.test(navigator.language || '') ? 'id' : 'en';
+  var T = L === 'id'
+    ? { load: 'Membangun rumah…', hint: 'Di HP/tablet bisa memakan waktu ±20–40 detik.', fail: 'Rumah belum bisa dimuat', reload: 'Muat ulang', fetch: 'Gagal mengunduh file aplikasi', retry: 'mencoba lagi…', net: 'Periksa koneksi, lalu muat ulang.', err: 'Terjadi error saat membangun: ', err2: '. Tutup tab lain lalu muat ulang.', slow: 'Aplikasi belum mulai setelah 40 detik' }
+    : { load: 'Building the house…', hint: 'On a phone or tablet this can take 20–40 seconds.', fail: 'The house could not be loaded', reload: 'Reload', fetch: 'Could not download the app files', retry: 'retrying…', net: 'Check the connection, then reload.', err: 'An error occurred while building: ', err2: '. Close other tabs and reload.', slow: 'The app has not started after 40 seconds' };
+  document.getElementById('loadTitle').textContent = T.load;
+  document.getElementById('loadMsg').textContent = T.hint;
+  var shown = false;
+  function show(msg) {
+    var l = document.getElementById('loading');
+    if (!l || shown) return;
+    shown = true;
+    l.innerHTML = '<div class="box"><b>' + T.fail + '</b><span>' + msg + '</span><button onclick="location.reload()">' + T.reload + '</button></div>';
+  }
+  function retry(why) {
+    var n = 0;
+    try { n = +(sessionStorage.getItem('h3s-retry') || 0); sessionStorage.setItem('h3s-retry', n + 1); } catch (e) { n = 9; }
+    if (n < 2) { var m = document.getElementById('loadMsg'); if (m) m.textContent = why + ' — ' + T.retry; setTimeout(function () { location.reload(); }, 1200); }
+    else show(why + '. ' + T.net);
+  }
+  window.__dhBoot = { show: show };
+  addEventListener('error', function (e) {
+    var el = e.target;
+    if (el && el.tagName === 'SCRIPT') return retry(T.fetch);
+    if (el && el !== window && el.tagName) return; // a texture/image failing is not fatal
+    if (document.getElementById('loading')) show(T.err + (e.message || '?') + T.err2);
+  }, true);
+  addEventListener('unhandledrejection', function (e) {
+    var msg = String((e.reason && e.reason.message) || e.reason || '');
+    if (/dynamically imported module|Importing a module script failed|Failed to fetch/i.test(msg)) retry(T.fetch);
+  });
+  setTimeout(function () {
+    if (document.getElementById('loading') && !window.__dhStarted) retry(T.slow);
+  }, 40000);
+})();
+</script>
+<script type="module" src="/engine/main.js"></script>
+</body>
+</html>
