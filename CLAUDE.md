@@ -198,6 +198,9 @@ If a test fails and you cannot fix it in two attempts, stop, explain plainly, an
 - **Assumptions / open questions** — every default you chose without the user's explicit word.
 - **Last checks** — date + result of validate / check / test / build, and what was not tested.
 - **Next step** — one sentence that `/lanjut` will act on.
+- **When a stage starts**, before the first data edit: set `stage:` and mark its line `[~]`, and record
+  the answers the user gave for it (Decisions). A session can end at any moment; `/lanjut` then knows
+  which stage was cut off and does not ask those questions again.
 Never store secrets, PINs, keys or addresses in it.
 
 ---

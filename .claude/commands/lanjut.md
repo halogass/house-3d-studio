@@ -12,6 +12,9 @@ argument-hint: "[nama-rumah / house-name]"
 2. Read `projects/<house>/progress.md` fully. Also skim `brief.md` and `style.md` if present.
 3. Re-verify the project is healthy before resuming: `npm run validate` and `npm run check`. If red,
    fixing that is the next step (tell the user plainly).
+   A stage marked `[~]` (or data files newer than `progress.md`'s `updated`) was interrupted: look at
+   what its data already contains, keep it, and finish that stage rather than starting it over. Reuse
+   the answers recorded in Decisions.
 4. Greet briefly in the language stored in `progress.md` (or of the user's message), summarise in 3–5 lines:
    what is done, open questions, the next step.
 5. If there are open questions in progress.md, ask them first (one batch, with options).
