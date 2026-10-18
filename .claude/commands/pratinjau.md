@@ -15,3 +15,9 @@ argument-hint: ""
    right thumb looks; minimap click = teleport; Options menu = time of day, month, quality.
 4. Optionally take screenshots (skill `qa-visual`) to confirm it renders, and say whether you did.
 5. Remind: stop with Ctrl+C in that terminal or ask you to stop it.
+
+**Non-interactive session** (e.g. `claude -p`, a script, CI): a dev server started there keeps the
+session from ending and stops with it, so the user could never open the link. Do not start it. Instead
+confirm the house renders (`node scripts/screenshots.mjs --only street,aerial`, look at both) and give
+the user the one command to run in their own terminal, `npm run dev`, plus what to open (`Local:` /
+`Network:` lines) and how to stop it (Ctrl+C).
