@@ -17,6 +17,13 @@ One copy of this repository = one house. The house lives in `projects/<house>/`.
    when available). Give 2–4 concrete options per question plus a sensible default marked
    "(recommended / disarankan)". Never ask one question at a time across many turns; never ask more
    than ~6 at once.
+   **Answers given up front / no way to ask.** If the user's message already answers some questions
+   (e.g. `/denah plan.jpg, standard ceilings, carport east`), do not ask those again. If you cannot ask
+   at all (non-interactive run, AskUserQuestion unavailable, or the user said "use your defaults" /
+   "terserah"), take the recommended option for every open question, carry on, and record each one
+   under *Assumptions* in `progress.md`; list them in your reply so the user can change them later.
+   Command arguments (`$ARGUMENTS`) may contain both the expected value (a name, a path) and such
+   answers: take the first word / the quoted or existing path as the value, the rest as answers.
 2. **Never invent dimensions silently.** If a size is read from a plan, guessed from a photo or chosen
    as a default, say so and confirm it. Keep a list of assumptions in `progress.md` → *Open questions*.
    A wrong wall is worse than a question.
@@ -114,7 +121,8 @@ validate/check/test run.
 | `projects/<house>/project.json` † | title (`{ id, en }`), language, location (city + region key; lat/lon rounded to city level), `features` flags, `style`, `spec` inputs, `cost` (region + quality), start position | wizard |
 | `projects/<house>/zoning.js` † | the plan: `site` (plot, road side, perimeter, site items), levels, rooms, openings, fixtures, stairs, roofs | wizard |
 | `projects/<house>/interior.js` † | finishes + furniture per room (`rooms`), furniture outside (`areas`) | wizard |
-| `projects/<house>/private/` | user's plan scans (`private/plans/`) and inspiration photos (`private/inspo/`); git-ignored, never deployed | user + wizard |
+| `projects/<house>/private/` | user's plan scans (`private/plans/`) and inspiration photos (`private/inspo/`); git-ignored, never deployed. Copy files in with `node scripts/import-files.mjs "<file or folder>" --to plans\|inspo` (paths with spaces OK; never `cp`) | user + wizard |
+| `projects/<house>/textures/` | the house's own textures made from owned photos (`node scripts/texture-from-photo.mjs`); **deployed** | wizard |
 | `projects/<house>/shots/` | screenshots from `qa-visual` | wizard |
 | `docs/SCHEMA.md` † | data format — the contract for every data edit | — |
 | `docs/ENGINE.md` † | engine internals | — |
@@ -143,7 +151,9 @@ All commands are run from the repository root and are identical in PowerShell an
 | `npm run test` | engine tests (headless) |
 | `npm run build` / `npm run preview` | production build / serve the build locally |
 | `npm run quantities` | regenerate areas and quantities for spec + cost |
-| `npm run textures` | convert textures (incl. textures-from-photos) to WebP |
+| `npm run textures` | convert the built-in CC0 textures to WebP (maintainers) |
+| `node scripts/import-files.mjs <file\|folder> --to plans\|inspo` | copy the user's plan / photos into `projects/<house>/private/` |
+| `node scripts/texture-from-photo.mjs <photo> --name <n> --crop x,y,w,h --seamless --size <m>` | a texture of the house from an owned photo (then `project.json` → `materials`) |
 | `npm run bake` | photoreal light bake (GPU only; long) |
 | `npm run deploy` | deploy to Vercel (wraps `npx vercel`) |
 

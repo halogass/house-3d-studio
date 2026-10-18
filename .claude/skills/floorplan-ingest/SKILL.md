@@ -38,6 +38,16 @@ bedroom label agrees within 2 %").
   draw walls separately unless SCHEMA requires free walls (garden walls etc.).
 - Openings: door width (default 0.9 interior, 1.0–1.2 entrance, 0.8 bathroom), swing side and hinge
   from the arc; sliding/folding/opening (no leaf) from the symbol; windows with width and (ask) sill.
+  Measure an opening **between the wall ends** (the gap in the wall), not between the thin frame or
+  glass lines drawn inside it — those make every window ~0.2–0.3 m too narrow. A door's width = the
+  radius of its swing arc (two arcs: their sum). Prefer rounding to common sizes (0.7, 0.8, 0.9, 1.2,
+  1.5, 1.8, 2.4 m) when the drawing is within ±5 cm.
+- Dashed lines between rooms usually mean no wall (open plan / one space): model as an `open` pair.
+- A plan drawn without the plot: ask where the house sits (setbacks front/side/back) and where the
+  car, terrace and garden go; until answered, centre it with ≥ 1.5 m to the side boundaries and record
+  that as an assumption.
+- Hand sketches: lines wobble and sizes are rough; trust the written numbers over the drawing, snap to
+  0.5 m, and ask for any key size that has no number.
 - Stairs: footprint + direction; check riser 0.15–0.18 m, going ≥ 0.25 m, width ≥ 0.9 m; if the plan's
   stair cannot fit those, say so.
 - Wet rooms: fixtures (WC, shower, sink, tub, kitchen counter) where drawn.

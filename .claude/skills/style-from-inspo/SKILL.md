@@ -37,12 +37,17 @@ Where photos conflict, offer 2 options. Ask for approval in one batch.
 
 ## 5. Textures from photos (owned/permitted photos only)
 - Purpose: a real tile, stone, wood, fabric or wallpaper the user photographed.
-- Crop a flat, evenly lit, front-on area (no perspective, no furniture), at least 512 px.
-- Make it tileable if possible (mirror/blend edges) and record its real-world size (ask: "about how big is
-  one tile/plank?").
-- Convert with `npm run textures` (sharp → WebP, mobile sizes). If the script needs a manifest entry,
-  follow `docs/SCHEMA.md`. Keep each texture ≤ ~300 KB (1024 px) and ≤ ~80 KB (512 px mobile).
-- Never make textures from people, faces, artworks, logos or brand items.
+- Find a flat, evenly lit, front-on area (no perspective, no furniture), at least 256 px; note its
+  position as fractions of the photo (x, y, w, h). Ask its real size ("about how big is one tile/plank?").
+- `node scripts/texture-from-photo.mjs projects/<house>/private/inspo/<photo> --name <name> --crop x,y,w,h --seamless --size <m>`
+  writes `projects/<house>/textures/<name>/diff.jpg`; add the printed snippet to `project.json` →
+  `materials` and use the material name in the finish (SCHEMA.md "The house's own textures"). No engine
+  edits are needed. Look at the result in a screenshot; if the pattern repeats visibly, crop a larger
+  area or raise `--size`.
+- The texture is **deployed** with the house (the photo itself stays private). Never make textures from
+  people, faces, artworks, logos or brand items.
+- Wood tones, paint colours and fabrics usually need no texture: pick the closest material or a colour
+  factory (`paint:#…`, `lacquer:#…`) or a colour-only custom material.
 
 ## 6. Write + check
 Write finishes into the interior/exterior data → `npm run validate` → `npm run check` →

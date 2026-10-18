@@ -62,7 +62,9 @@ try {
   console.log(`GPU: ${gpu.name}${gpu.software ? ' (software rendering: slow)' : ''}`);
   const site = Z.site, cx = site.w / 2, cy = site.d / 2;
   if (want('street')) await shot('street.png', `?${common}`);
-  if (want('aerial')) await shot('aerial.png', `?${common}&mode=house&cam=${site.w + 12},-12,${Math.max(site.w, site.d) * 0.9},${cx},${cy},0`);
+  // from the south-east, far enough that the whole plot fills about two thirds of the frame
+  const span = Math.max(site.w, site.d, 12);
+  if (want('aerial')) await shot('aerial.png', `?${common}&mode=house&cam=${(cx + span * 0.48).toFixed(1)},${(cy - span * 0.72).toFixed(1)},${(span * 0.62).toFixed(1)},${cx},${cy},0`);
   for (const lv of LEVEL_ORDER) if (want('cut-' + lv)) {
     const rooms = Z.floors[lv] || [];
     if (!rooms.length) continue;
